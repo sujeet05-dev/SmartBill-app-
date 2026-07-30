@@ -5,7 +5,7 @@ import { z } from 'zod';
 import toast from 'react-hot-toast';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
-import { shopService, Shop } from '@/services/shop';
+import { shopService, type Shop } from '@/services/shop';
 
 const shopSchema = z.object({
   name: z.string().min(1, 'Shop Name is required'),
@@ -68,18 +68,6 @@ export const ShopProfile: React.FC = () => {
   return (
     <div className="max-w-3xl mx-auto bg-white shadow rounded-lg p-6">
       <h2 className="text-2xl font-bold text-slate-900 mb-6">Shop Profile</h2>
-
-      {successMsg && (
-        <div className="mb-4 p-4 bg-green-50 text-green-700 rounded-md">
-          {successMsg}
-        </div>
-      )}
-
-      {errorMsg && (
-        <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-md">
-          {errorMsg}
-        </div>
-      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

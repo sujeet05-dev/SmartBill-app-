@@ -1,5 +1,5 @@
 import api from './api';
-import { Product } from './products';
+import { type Product } from './products';
 
 export interface InvoiceItemCreate {
   productId: number;

@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { Modal } from '@/components/common/Modal';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
-import { productService, Product } from '@/services/products';
+import { productService, type Product } from '@/services/products';
 
 const productSchema = z.object({
   name: z.string().min(1, 'Product name is required'),
@@ -18,7 +18,7 @@ const productSchema = z.object({
   stock: z.preprocess((val) => Number(val), z.number().int().min(0, 'Stock cannot be negative')),
 });
 
-type ProductForm = z.infer<typeof productSchema>;
+// Form will be handled with any to avoid Zod preprocessing type mismatches
 
 interface ProductFormModalProps {
   isOpen: boolean;
@@ -33,12 +33,14 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
   product,
   onSaved 
 }) => {
+  const [isLoading, setIsLoading] = React.useState(false);
+
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
-  } = useForm<ProductForm>({
+    formState: { errors },
+  } = useForm<any>({
     resolver: zodResolver(productSchema),
   });
 
@@ -60,19 +62,31 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
     }
   }, [isOpen, product, reset]);
 
-  const onSubmit = async (data: ProductForm) => {
+  const onSubmit = async (data: any) => {
     try {
+      setIsLoading(true);
+      const payload: Product = {
+        id: product?.id || 0,
+        name: data.name,
+        brand: data.brand,
+        category: data.category,
+        sku: data.sku || '',
+        price: data.price,
+        gstPercentage: data.gstPercentage,
+        stock: data.stock,
+      };
+
       if (product?.id) {
-        await productService.updateProduct(product.id, data);
+        await productService.updateProduct(product.id, payload);
         toast.success('Product updated successfully!');
       } else {
-        await productService.createProduct(data);
+        await productService.createProduct(payload);
         toast.success('Product added successfully!');
       }
       onSaved();
       onClose();
     } catch (err: any) {
-      setApiError(err.response?.data?.message || 'An error occurred while saving the product.');
+      toast.error(err.response?.data?.message || 'An error occurred while saving the product.');
     } finally {
       setIsLoading(false);
     }
@@ -84,32 +98,26 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
       onClose={onClose} 
       title={product ? 'Edit Product' : 'Add New Product'}
     >
-      {apiError && (
-        <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md text-sm">
-          {apiError}
-        </div>
-      )}
-
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="sm:col-span-2">
             <Input
               label="Product Name"
-              {...register('name', { required: 'Name is required' })}
-              error={errors.name?.message}
+              {...register('name')}
+              error={errors.name?.message as string}
             />
           </div>
           
           <Input
             label="Brand"
-            {...register('brand', { required: 'Brand is required' })}
-            error={errors.brand?.message}
+            {...register('brand')}
+            error={errors.brand?.message as string}
           />
           
           <Input
             label="Category"
-            {...register('category', { required: 'Category is required' })}
-            error={errors.category?.message}
+            {...register('category')}
+            error={errors.category?.message as string}
           />
           
           <Input
@@ -117,11 +125,8 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             type="number"
             step="0.01"
             min="0"
-            {...register('price', { 
-              required: 'Price is required',
-              min: { value: 0, message: 'Price cannot be negative' }
-            })}
-            error={errors.price?.message}
+            {...register('price')}
+            error={errors.price?.message as string}
           />
           
           <Input
@@ -129,28 +134,22 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             type="number"
             step="0.1"
             min="0"
-            {...register('gstPercentage', { 
-              required: 'GST % is required',
-              min: { value: 0, message: 'GST cannot be negative' }
-            })}
-            error={errors.gstPercentage?.message}
+            {...register('gstPercentage')}
+            error={errors.gstPercentage?.message as string}
           />
           
           <Input
             label="Stock Quantity"
             type="number"
             min="0"
-            {...register('stock', { 
-              required: 'Stock is required',
-              min: { value: 0, message: 'Stock cannot be negative' }
-            })}
-            error={errors.stock?.message}
+            {...register('stock')}
+            error={errors.stock?.message as string}
           />
           
           <Input
             label="SKU (Optional)"
             {...register('sku')}
-            error={errors.sku?.message}
+            error={errors.sku?.message as string}
           />
         </div>
 

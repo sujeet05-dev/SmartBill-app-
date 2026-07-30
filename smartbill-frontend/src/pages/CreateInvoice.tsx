@@ -3,8 +3,8 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
-import { productService, Product } from '@/services/products';
-import { invoiceService, InvoiceCreate } from '@/services/invoices';
+import { productService, type Product } from '@/services/products';
+import { invoiceService, type InvoiceCreate } from '@/services/invoices';
 import { Plus, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -12,9 +12,8 @@ export const CreateInvoice: React.FC = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [apiError, setApiError] = useState('');
 
-  const { register, control, handleSubmit, watch, formState: { errors } } = useForm<InvoiceCreate>({
+  const { register, control, handleSubmit, watch } = useForm<InvoiceCreate>({
     defaultValues: {
       paymentMethod: 'CASH',
       items: [{ productId: 0, quantity: 1 }]
@@ -68,24 +67,27 @@ export const CreateInvoice: React.FC = () => {
   const onSubmit = async (data: InvoiceCreate) => {
     try {
       setIsLoading(true);
-      setApiError('');
 
-      // Filter out empty rows and convert strings to numbers
-      const validItems = data.items
-        .filter(item => item.productId && item.quantity > 0)
-        .map(item => ({
-          productId: Number(item.productId),
-          quantity: Number(item.quantity)
-        }));
+      const items = data.items.map(item => ({
+        productId: Number(item.productId),
+        quantity: Number(item.quantity)
+      }));
 
-      if (validItems.length === 0) {
-        setApiError('Please add at least one valid product to the invoice.');
+      // Find any items that don't have enough stock
+      const invalidItems = items.filter(item => {
+        const product = products.find(p => p.id === item.productId);
+        return !product || product.stock < item.quantity;
+      });
+
+      if (invalidItems.length > 0) {
+        toast.error('One or more selected products have insufficient stock.');
+        setIsLoading(false);
         return;
       }
 
       await invoiceService.createInvoice({
         ...data,
-        items: validItems
+        items: items
       });
 
       toast.success('Invoice generated successfully!');
@@ -103,12 +105,6 @@ export const CreateInvoice: React.FC = () => {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-slate-900">Create New Invoice</h2>
       </div>
-
-      {apiError && (
-        <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-md">
-          {apiError}
-        </div>
-      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Customer Details */}

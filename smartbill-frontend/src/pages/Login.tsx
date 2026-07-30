@@ -8,6 +8,8 @@ import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
 import toast from 'react-hot-toast';
 
+import api from '@/services/api';
+
 const loginSchema = z.object({
   username: z.string().email('Invalid email format'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
@@ -25,7 +27,9 @@ export const Login: React.FC = () => {
 
   const onSubmit = async (data: LoginForm) => {
     try {
-      await login(data.username, data.password);
+      const response = await api.post('/auth/login', data);
+      const { token, email, role } = response.data;
+      login(token, { email, role });
       toast.success('Logged in successfully');
       navigate('/');
     } catch (error) {

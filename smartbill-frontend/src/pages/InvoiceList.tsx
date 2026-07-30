@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { invoiceService, InvoiceResponse } from '@/services/invoices';
+import { invoiceService, type InvoiceResponse } from '@/services/invoices';
 import { Button } from '@/components/common/Button';
 import { Plus, Eye, Search } from 'lucide-react';
 import { format } from 'date-fns';

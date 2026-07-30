@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { productService, Product } from '@/services/products';
+import { productService, type Product } from '@/services/products';
 import { Button } from '@/components/common/Button';
-import { Input } from '@/components/common/Input';
 import { Search, Plus, Edit2, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ProductFormModal } from './ProductFormModal';

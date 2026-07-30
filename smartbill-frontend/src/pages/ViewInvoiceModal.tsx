@@ -1,5 +1,5 @@
 import React from 'react';
-import { InvoiceResponse } from '@/services/invoices';
+import { type InvoiceResponse } from '@/services/invoices';
 import { Modal } from '@/components/common/Modal';
 import { Button } from '@/components/common/Button';
 import { format } from 'date-fns';
@@ -90,8 +90,8 @@ export const ViewInvoiceModal: React.FC<ViewInvoiceModalProps> = ({
 
         {/* Actions */}
         <div className="flex justify-end space-x-3 pt-4 border-t border-slate-200">
-          <Button variant="outline" onClick={onClose}>Close</Button>
-          <Button variant="outline" onClick={() => onDownload(invoice.id, invoice.invoiceNumber)}>
+          <Button variant="secondary" onClick={onClose}>Close</Button>
+          <Button variant="secondary" onClick={() => onDownload(invoice.id, invoice.invoiceNumber)}>
             <Download className="w-4 h-4 mr-2" />
             Download PDF
           </Button>
