@@ -1,0 +1,19 @@
+# Build stage
+FROM eclipse-temurin:21-jdk-alpine AS build
+WORKDIR /app
+COPY .mvn/ .mvn
+COPY mvnw pom.xml ./
+# Ensure mvnw has execution permissions
+RUN chmod +x mvnw
+# Download dependencies
+RUN ./mvnw dependency:go-offline
+COPY src ./src
+# Build the application
+RUN ./mvnw package -DskipTests
+
+# Run stage
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+COPY --from=build /app/target/smartbill-0.0.1-SNAPSHOT.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
