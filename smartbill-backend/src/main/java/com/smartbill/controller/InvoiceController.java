@@ -48,4 +48,10 @@ public class InvoiceController {
                 .header("Content-Disposition", "inline; filename=\"invoice_" + invoice.getInvoiceNumber() + ".pdf\"")
                 .body(pdfBytes);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteInvoice(@PathVariable Long id) {
+        invoiceService.deleteInvoice(id);
+        return ResponseEntity.noContent().build();
+    }
 }

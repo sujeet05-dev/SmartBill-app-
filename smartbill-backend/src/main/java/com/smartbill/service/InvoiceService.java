@@ -116,4 +116,21 @@ public class InvoiceService {
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
         return invoiceMapper.toDto(invoice);
     }
+
+    @Transactional
+    public void deleteInvoice(Long id) {
+        Invoice invoice = invoiceRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Invoice not found"));
+        
+        // Restore product stock
+        for (InvoiceItem item : invoice.getItems()) {
+            Product product = item.getProduct();
+            if (product != null) {
+                product.setStock(product.getStock() + item.getQuantity());
+                productRepository.save(product);
+            }
+        }
+        
+        invoiceRepository.delete(invoice);
+    }
 }

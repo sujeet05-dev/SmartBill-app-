@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { invoiceService, type InvoiceResponse } from '@/services/invoices';
 import { Button } from '@/components/common/Button';
-import { Plus, Eye, Search } from 'lucide-react';
+import { Plus, Eye, Search, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import { ViewInvoiceModal } from './ViewInvoiceModal';
@@ -59,6 +59,19 @@ export const InvoiceList: React.FC = () => {
     } catch (error) {
       console.error('Failed to open PDF', error);
       toast.error('Failed to open invoice PDF.');
+    }
+  };
+
+  const handleDeleteInvoice = async (id: number) => {
+    if (window.confirm('Are you sure you want to delete this invoice? The products will be returned to inventory stock.')) {
+      try {
+        await invoiceService.deleteInvoice(id);
+        toast.success('Invoice deleted successfully');
+        loadInvoices();
+      } catch (error) {
+        console.error('Failed to delete invoice', error);
+        toast.error('Failed to delete invoice.');
+      }
     }
   };
 
@@ -151,6 +164,13 @@ export const InvoiceList: React.FC = () => {
                       title="Download PDF"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteInvoice(invoice.id)}
+                      className="text-red-600 hover:text-red-900 ml-4"
+                      title="Delete Invoice"
+                    >
+                      <Trash2 className="h-5 w-5" />
                     </button>
                   </td>
                 </tr>

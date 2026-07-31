@@ -59,4 +59,9 @@ export const invoiceService = {
     });
     return response.data;
   },
+
+  deleteInvoice: async (id: number) => {
+    const response = await api.delete(`/invoices/${id}`);
+    return response.data;
+  },
 };
