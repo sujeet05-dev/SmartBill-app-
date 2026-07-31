@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
 public class ProductService {
 
@@ -27,7 +29,10 @@ public class ProductService {
         } else {
             products = productRepository.findAll();
         }
-        return products.stream().map(productMapper::toDto).collect(Collectors.toList());
+        return products.stream()
+                .filter(p -> !p.isDeleted())
+                .map(productMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     public ProductDto createProduct(ProductDto productDto) {
@@ -40,6 +45,10 @@ public class ProductService {
         Product existing = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         
+        if (existing.isDeleted()) {
+            throw new RuntimeException("Product is deleted");
+        }
+
         existing.setName(productDto.getName());
         existing.setBrand(productDto.getBrand());
         existing.setCategory(productDto.getCategory());
@@ -52,10 +61,11 @@ public class ProductService {
         return productMapper.toDto(saved);
     }
 
+    @Transactional
     public void deleteProduct(Long id) {
-        if (!productRepository.existsById(id)) {
-            throw new RuntimeException("Product not found");
-        }
-        productRepository.deleteById(id);
+        Product existing = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        existing.setDeleted(true);
+        productRepository.save(existing);
     }
 }
