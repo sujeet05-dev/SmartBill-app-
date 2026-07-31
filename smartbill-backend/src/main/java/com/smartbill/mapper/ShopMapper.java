@@ -24,7 +24,9 @@ public class ShopMapper {
     public Shop toEntity(ShopDto dto) {
         if (dto == null) return null;
         Shop shop = new Shop();
-        shop.setId(dto.getId());
+        if (dto.getId() != null && dto.getId() != 0) {
+            shop.setId(dto.getId());
+        }
         shop.setName(dto.getName());
         shop.setOwnerName(dto.getOwnerName());
         shop.setAddress(dto.getAddress());

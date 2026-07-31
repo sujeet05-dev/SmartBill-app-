@@ -24,7 +24,9 @@ public class ProductMapper {
     public Product toEntity(ProductDto dto) {
         if (dto == null) return null;
         Product product = new Product();
-        product.setId(dto.getId());
+        if (dto.getId() != null && dto.getId() != 0) {
+            product.setId(dto.getId());
+        }
         product.setName(dto.getName());
         product.setBrand(dto.getBrand());
         product.setCategory(dto.getCategory());
