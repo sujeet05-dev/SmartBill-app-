@@ -32,7 +32,7 @@ public class Product {
     @Column
     private String sku;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "boolean default false")
     private boolean deleted = false;
 
     public Product() {}
