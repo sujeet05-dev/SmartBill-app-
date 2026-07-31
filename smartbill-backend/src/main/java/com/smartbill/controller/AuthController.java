@@ -2,6 +2,7 @@ package com.smartbill.controller;
 
 import com.smartbill.dto.AuthResponse;
 import com.smartbill.dto.LoginRequest;
+import com.smartbill.dto.RegisterRequest;
 import com.smartbill.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -20,5 +21,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.authenticate(request));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+        return ResponseEntity.ok(authService.register(request));
     }
 }

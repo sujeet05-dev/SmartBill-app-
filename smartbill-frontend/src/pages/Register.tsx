@@ -7,33 +7,39 @@ import { useAuth } from '@/context/AuthContext';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
 import toast from 'react-hot-toast';
-
 import api from '@/services/api';
 
-const loginSchema = z.object({
+const registerSchema = z.object({
   username: z.string().email('Invalid email format'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
-type LoginForm = z.infer<typeof loginSchema>;
+type RegisterForm = z.infer<typeof registerSchema>;
 
-export const Login: React.FC = () => {
+export const Register: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginForm>({
-    resolver: zodResolver(loginSchema),
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<RegisterForm>({
+    resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = async (data: LoginForm) => {
+  const onSubmit = async (data: RegisterForm) => {
     try {
-      const response = await api.post('/auth/login', data);
+      const payload = {
+        email: data.username,
+        password: data.password
+      };
+      
+      const response = await api.post('/auth/register', payload);
       const { token, email, role } = response.data;
+      
+      // Auto-login the user after registration
       login(token, { email, role });
-      toast.success('Logged in successfully');
+      toast.success('Account created successfully!');
       navigate('/');
-    } catch (error) {
-      toast.error('Invalid credentials');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to create account');
     }
   };
 
@@ -42,10 +48,10 @@ export const Login: React.FC = () => {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900">
-            SmartBill Admin
+            Create an Account
           </h2>
           <p className="mt-2 text-center text-sm text-slate-600">
-            Sign in to manage your shop
+            Join SmartBill to manage your shop
           </p>
         </div>
         
@@ -73,13 +79,13 @@ export const Login: React.FC = () => {
             className="w-full mt-6"
             isLoading={isSubmitting}
           >
-            Sign in
+            Sign up
           </Button>
 
           <div className="text-center mt-4 text-sm text-slate-600">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-blue-600 hover:text-blue-800 font-medium">
-              Sign up
+            Already have an account?{' '}
+            <Link to="/login" className="text-blue-600 hover:text-blue-800 font-medium">
+              Sign in
             </Link>
           </div>
         </form>

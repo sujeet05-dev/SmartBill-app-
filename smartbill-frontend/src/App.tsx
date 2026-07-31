@@ -3,6 +3,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import { ProtectedRoute } from '@/components/layout/ProtectedRoute';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Login } from '@/pages/Login';
+import { Register } from '@/pages/Register';
 import { ShopProfile } from '@/pages/ShopProfile';
 import { Inventory } from '@/pages/Inventory';
 import { InvoiceList } from '@/pages/InvoiceList';
@@ -24,6 +25,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           
           <Route path="/" element={
             <ProtectedRoute>
