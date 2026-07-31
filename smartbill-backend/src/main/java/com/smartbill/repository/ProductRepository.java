@@ -13,4 +13,7 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByNameContainingIgnoreCaseOrBrandContainingIgnoreCaseOrSkuContainingIgnoreCase(String name, String brand, String sku);
 
+    @Modifying
+    @Query("DELETE FROM InvoiceItem i WHERE i.product.id = :productId")
+    void deleteInvoiceItemsByProductId(@Param("productId") Long productId);
 }

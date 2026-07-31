@@ -30,7 +30,6 @@ public class ProductService {
             products = productRepository.findAll();
         }
         return products.stream()
-                .filter(p -> !p.isDeleted())
                 .map(productMapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -45,10 +44,6 @@ public class ProductService {
         Product existing = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         
-        if (existing.isDeleted()) {
-            throw new RuntimeException("Product is deleted");
-        }
-
         existing.setName(productDto.getName());
         existing.setBrand(productDto.getBrand());
         existing.setCategory(productDto.getCategory());
@@ -63,9 +58,10 @@ public class ProductService {
 
     @Transactional
     public void deleteProduct(Long id) {
-        Product existing = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-        existing.setDeleted(true);
-        productRepository.save(existing);
+        if (!productRepository.existsById(id)) {
+            throw new RuntimeException("Product not found");
+        }
+        productRepository.deleteInvoiceItemsByProductId(id);
+        productRepository.deleteById(id);
     }
 }

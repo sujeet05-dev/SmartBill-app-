@@ -32,9 +32,6 @@ public class Product {
     @Column
     private String sku;
 
-    @Column(columnDefinition = "boolean default false")
-    private boolean deleted = false;
-
     public Product() {}
 
     // Getters and Setters
@@ -62,7 +59,4 @@ public class Product {
 
     public String getSku() { return sku; }
     public void setSku(String sku) { this.sku = sku; }
-
-    public boolean isDeleted() { return deleted; }
-    public void setDeleted(boolean deleted) { this.deleted = deleted; }
 }
