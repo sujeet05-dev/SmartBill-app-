@@ -22,7 +22,7 @@ public class RegisterRequest {
     }
 
     public String getEmail() {
-        return email;
+        return email != null ? email.trim().toLowerCase() : null;
     }
 
     public void setEmail(String email) {

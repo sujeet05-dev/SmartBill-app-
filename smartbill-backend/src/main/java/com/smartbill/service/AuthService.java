@@ -28,12 +28,21 @@ public class AuthService {
     }
 
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Email is already registered");
+        if (request.getEmail() == null || request.getEmail().isBlank()) {
+            throw new RuntimeException("Email is required");
+        }
+        if (request.getPassword() == null || request.getPassword().isBlank()) {
+            throw new RuntimeException("Password is required");
+        }
+
+        String cleanEmail = request.getEmail().trim().toLowerCase();
+
+        if (userRepository.findByEmailIgnoreCase(cleanEmail).isPresent()) {
+            throw new RuntimeException("Email is already registered. Please sign in.");
         }
 
         User user = new User(
-                request.getEmail(),
+                cleanEmail,
                 passwordEncoder.encode(request.getPassword()),
                 Role.ADMIN
         );
@@ -45,15 +54,25 @@ public class AuthService {
     }
 
     public AuthResponse authenticate(LoginRequest request) {
+        String email = request.getEmail();
+        if (email == null || email.isBlank()) {
+            throw new RuntimeException("Email or username is required");
+        }
+        if (request.getPassword() == null || request.getPassword().isBlank()) {
+            throw new RuntimeException("Password is required");
+        }
+
+        String cleanEmail = email.trim().toLowerCase();
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
+                        cleanEmail,
                         request.getPassword()
                 )
         );
 
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByEmailIgnoreCase(cleanEmail)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + cleanEmail));
 
         String jwtToken = jwtService.generateToken(user);
         

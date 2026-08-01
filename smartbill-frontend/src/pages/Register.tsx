@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 import api from '@/services/api';
 
 const registerSchema = z.object({
-  username: z.string().email('Invalid email format'),
+  email: z.string().min(1, 'Email is required').email('Invalid email format'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
@@ -27,19 +27,19 @@ export const Register: React.FC = () => {
   const onSubmit = async (data: RegisterForm) => {
     try {
       const payload = {
-        email: data.username,
+        email: data.email.trim().toLowerCase(),
         password: data.password
       };
       
       const response = await api.post('/auth/register', payload);
       const { token, email, role } = response.data;
       
-      // Auto-login the user after registration
       login(token, { email, role });
       toast.success('Account created successfully!');
       navigate('/');
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to create account');
+      const errorMsg = error.response?.data?.message || 'Failed to create account';
+      toast.error(errorMsg);
     }
   };
 
@@ -61,8 +61,8 @@ export const Register: React.FC = () => {
               label="Email Address"
               type="email"
               placeholder="admin@smartbill.com"
-              {...register('username')}
-              error={errors.username?.message}
+              {...register('email')}
+              error={errors.email?.message}
             />
             
             <Input

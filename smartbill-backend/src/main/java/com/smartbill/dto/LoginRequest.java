@@ -1,15 +1,9 @@
 package com.smartbill.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-
 public class LoginRequest {
     
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email should be valid")
     private String email;
-    
-    @NotBlank(message = "Password is required")
+    private String username;
     private String password;
 
     public LoginRequest() {}
@@ -20,11 +14,28 @@ public class LoginRequest {
     }
 
     public String getEmail() {
+        if (email != null && !email.isBlank()) {
+            return email.trim().toLowerCase();
+        }
+        if (username != null && !username.isBlank()) {
+            return username.trim().toLowerCase();
+        }
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+        if (this.email == null || this.email.isBlank()) {
+            this.email = username;
+        }
     }
 
     public String getPassword() {
