@@ -7,6 +7,7 @@ import { Register } from '@/pages/Register';
 import { ShopProfile } from '@/pages/ShopProfile';
 import { Inventory } from '@/pages/Inventory';
 import { InvoiceList } from '@/pages/InvoiceList';
+import { MonthlyInvoices } from '@/pages/MonthlyInvoices';
 import { CreateInvoice } from '@/pages/CreateInvoice';
 import { Toaster } from 'react-hot-toast';
 
@@ -36,6 +37,7 @@ function App() {
             <Route path="shop" element={<ShopProfile />} />
             <Route path="inventory" element={<Inventory />} />
             <Route path="invoices" element={<InvoiceList />} />
+            <Route path="monthly-invoices" element={<MonthlyInvoices />} />
             <Route path="invoices/new" element={<CreateInvoice />} />
           </Route>
         </Routes>

@@ -3,6 +3,7 @@ package com.smartbill.service;
 import com.smartbill.dto.InvoiceCreateDto;
 import com.smartbill.dto.InvoiceDto;
 import com.smartbill.dto.InvoiceItemCreateDto;
+import com.smartbill.dto.MonthlySummaryDto;
 import com.smartbill.entity.Invoice;
 import com.smartbill.entity.InvoiceItem;
 import com.smartbill.entity.Product;
@@ -18,8 +19,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -137,5 +137,41 @@ public class InvoiceService {
         }
         
         invoiceRepository.delete(invoice);
+    }
+
+    @Transactional(readOnly = true)
+    public List<MonthlySummaryDto> getMonthlySummary() {
+        User currentUser = securityUtils.getCurrentUser();
+        List<Invoice> invoices = invoiceRepository.findByUserOrderByDateDesc(currentUser);
+
+        Map<String, MonthlySummaryDto> summaryMap = new LinkedHashMap<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM yyyy");
+
+        for (Invoice invoice : invoices) {
+            String monthYear = invoice.getDate().format(formatter);
+            int year = invoice.getDate().getYear();
+            int month = invoice.getDate().getMonthValue();
+
+            MonthlySummaryDto summary = summaryMap.computeIfAbsent(monthYear, k ->
+                    new MonthlySummaryDto(k, year, month, 0, BigDecimal.ZERO, BigDecimal.ZERO)
+            );
+
+            summary.setTotalInvoices(summary.getTotalInvoices() + 1);
+            summary.setTotalAmount(summary.getTotalAmount().add(invoice.getGrandTotal()));
+            summary.setTotalGst(summary.getTotalGst().add(invoice.getTotalGst()));
+        }
+
+        return new ArrayList<>(summaryMap.values());
+    }
+
+    @Transactional(readOnly = true)
+    public List<InvoiceDto> getInvoicesByMonth(int year, int month) {
+        User currentUser = securityUtils.getCurrentUser();
+        List<Invoice> invoices = invoiceRepository.findByUserOrderByDateDesc(currentUser);
+
+        return invoices.stream()
+                .filter(i -> i.getDate().getYear() == year && i.getDate().getMonthValue() == month)
+                .map(invoiceMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

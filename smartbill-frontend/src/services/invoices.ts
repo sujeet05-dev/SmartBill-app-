@@ -36,10 +36,29 @@ export interface InvoiceResponse {
   items: InvoiceItemResponse[];
 }
 
+export interface MonthlySummaryResponse {
+  monthYear: string;
+  year: number;
+  month: number;
+  totalInvoices: number;
+  totalAmount: number;
+  totalGst: number;
+}
+
 export const invoiceService = {
   getAllInvoices: async (search?: string) => {
     const params = search ? { search } : {};
     const response = await api.get('/invoices', { params });
+    return response.data;
+  },
+
+  getMonthlySummary: async (): Promise<MonthlySummaryResponse[]> => {
+    const response = await api.get('/invoices/monthly-summary');
+    return response.data;
+  },
+
+  getInvoicesByMonth: async (year: number, month: number): Promise<InvoiceResponse[]> => {
+    const response = await api.get('/invoices/by-month', { params: { year, month } });
     return response.data;
   },
 
