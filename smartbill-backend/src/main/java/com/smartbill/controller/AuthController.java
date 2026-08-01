@@ -1,6 +1,7 @@
 package com.smartbill.controller;
 
 import com.smartbill.dto.AuthResponse;
+import com.smartbill.dto.GoogleAuthRequest;
 import com.smartbill.dto.LoginRequest;
 import com.smartbill.dto.RegisterRequest;
 import com.smartbill.service.AuthService;
@@ -27,4 +28,10 @@ public class AuthController {
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }
+
+    @PostMapping("/google")
+    public ResponseEntity<AuthResponse> googleAuth(@RequestBody GoogleAuthRequest request) {
+        return ResponseEntity.ok(authService.authenticateWithGoogle(request.getIdToken()));
+    }
 }
+
