@@ -2,38 +2,43 @@ package com.smartbill.service;
 
 import com.smartbill.dto.ShopDto;
 import com.smartbill.entity.Shop;
+import com.smartbill.entity.User;
 import com.smartbill.mapper.ShopMapper;
 import com.smartbill.repository.ShopRepository;
+import com.smartbill.security.SecurityUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ShopService {
 
     private final ShopRepository shopRepository;
     private final ShopMapper shopMapper;
+    private final SecurityUtils securityUtils;
 
-    public ShopService(ShopRepository shopRepository, ShopMapper shopMapper) {
+    public ShopService(ShopRepository shopRepository, ShopMapper shopMapper, SecurityUtils securityUtils) {
         this.shopRepository = shopRepository;
         this.shopMapper = shopMapper;
+        this.securityUtils = securityUtils;
     }
 
     public ShopDto getShop() {
-        List<Shop> shops = shopRepository.findAll();
-        if (shops.isEmpty()) {
-            return null;
-        }
-        return shopMapper.toDto(shops.get(0));
+        User currentUser = securityUtils.getCurrentUser();
+        Optional<Shop> shopOpt = shopRepository.findByUser(currentUser);
+        return shopOpt.map(shopMapper::toDto).orElse(null);
     }
 
     public ShopDto saveOrUpdateShop(ShopDto shopDto) {
-        List<Shop> shops = shopRepository.findAll();
+        User currentUser = securityUtils.getCurrentUser();
+        Optional<Shop> shopOpt = shopRepository.findByUser(currentUser);
+        
         Shop shop;
-        if (shops.isEmpty()) {
+        if (shopOpt.isEmpty()) {
             shop = shopMapper.toEntity(shopDto);
+            shop.setUser(currentUser);
         } else {
-            shop = shops.get(0);
+            shop = shopOpt.get();
             shop.setName(shopDto.getName());
             shop.setOwnerName(shopDto.getOwnerName());
             shop.setAddress(shopDto.getAddress());
@@ -42,6 +47,7 @@ public class ShopService {
             shop.setGstin(shopDto.getGstin());
             shop.setLogoUrl(shopDto.getLogoUrl());
         }
+        
         Shop saved = shopRepository.save(shop);
         return shopMapper.toDto(saved);
     }

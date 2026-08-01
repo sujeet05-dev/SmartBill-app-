@@ -31,6 +31,10 @@ public class Shop {
     @Column(columnDefinition = "TEXT")
     private String logoUrl;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     public Shop() {}
 
     // Getters and Setters
@@ -57,4 +61,7 @@ public class Shop {
 
     public String getLogoUrl() { return logoUrl; }
     public void setLogoUrl(String logoUrl) { this.logoUrl = logoUrl; }
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }

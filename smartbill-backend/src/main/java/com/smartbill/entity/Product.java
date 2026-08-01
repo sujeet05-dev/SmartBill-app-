@@ -32,6 +32,10 @@ public class Product {
     @Column
     private String sku;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     public Product() {}
 
     // Getters and Setters
@@ -59,4 +63,7 @@ public class Product {
 
     public String getSku() { return sku; }
     public void setSku(String sku) { this.sku = sku; }
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }

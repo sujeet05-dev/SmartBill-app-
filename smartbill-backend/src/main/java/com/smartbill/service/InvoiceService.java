@@ -6,9 +6,11 @@ import com.smartbill.dto.InvoiceItemCreateDto;
 import com.smartbill.entity.Invoice;
 import com.smartbill.entity.InvoiceItem;
 import com.smartbill.entity.Product;
+import com.smartbill.entity.User;
 import com.smartbill.mapper.InvoiceMapper;
 import com.smartbill.repository.InvoiceRepository;
 import com.smartbill.repository.ProductRepository;
+import com.smartbill.security.SecurityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,24 +28,25 @@ public class InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final ProductRepository productRepository;
     private final InvoiceMapper invoiceMapper;
+    private final SecurityUtils securityUtils;
 
-    public InvoiceService(InvoiceRepository invoiceRepository, ProductRepository productRepository, InvoiceMapper invoiceMapper) {
+    public InvoiceService(InvoiceRepository invoiceRepository, ProductRepository productRepository, InvoiceMapper invoiceMapper, SecurityUtils securityUtils) {
         this.invoiceRepository = invoiceRepository;
         this.productRepository = productRepository;
         this.invoiceMapper = invoiceMapper;
+        this.securityUtils = securityUtils;
     }
 
     @Transactional
     public InvoiceDto createInvoice(InvoiceCreateDto createDto) {
+        User currentUser = securityUtils.getCurrentUser();
         Invoice invoice = new Invoice();
+        invoice.setUser(currentUser);
         invoice.setCustomerName(createDto.getCustomerName());
         invoice.setCustomerMobile(createDto.getCustomerMobile());
         invoice.setPaymentMethod(createDto.getPaymentMethod());
         invoice.setDate(LocalDateTime.now());
         
-        // Generate Invoice Number (INV-YYYYMMDD-ID)
-        // We will assign a temporary one and update after save if relying on DB sequence, 
-        // or just use timestamp
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
         invoice.setInvoiceNumber("INV-" + timestamp);
 
@@ -53,7 +56,7 @@ public class InvoiceService {
         List<InvoiceItem> items = new ArrayList<>();
 
         for (InvoiceItemCreateDto itemDto : createDto.getItems()) {
-            Product product = productRepository.findById(itemDto.getProductId())
+            Product product = productRepository.findByIdAndUser(itemDto.getProductId(), currentUser)
                     .orElseThrow(() -> new RuntimeException("Product not found: " + itemDto.getProductId()));
 
             if (product.getStock() < itemDto.getQuantity()) {
@@ -90,7 +93,6 @@ public class InvoiceService {
 
         Invoice saved = invoiceRepository.save(invoice);
         
-        // Optional: Update invoice number using actual DB ID for cleaner numbers (INV-0001)
         saved.setInvoiceNumber("INV-" + String.format("%06d", saved.getId()));
         saved = invoiceRepository.save(saved);
 
@@ -99,11 +101,12 @@ public class InvoiceService {
 
     @Transactional(readOnly = true)
     public List<InvoiceDto> getAllInvoices(String search) {
+        User currentUser = securityUtils.getCurrentUser();
         List<Invoice> invoices;
         if (search != null && !search.trim().isEmpty()) {
-            invoices = invoiceRepository.findByInvoiceNumberContainingIgnoreCaseOrCustomerNameContainingIgnoreCaseOrderByDateDesc(search, search);
+            invoices = invoiceRepository.searchByUser(currentUser, search.trim());
         } else {
-            invoices = invoiceRepository.findAllByOrderByDateDesc();
+            invoices = invoiceRepository.findByUserOrderByDateDesc(currentUser);
         }
         return invoices.stream()
                 .map(invoiceMapper::toDto)
@@ -112,14 +115,16 @@ public class InvoiceService {
 
     @Transactional(readOnly = true)
     public InvoiceDto getInvoiceById(Long id) {
-        Invoice invoice = invoiceRepository.findById(id)
+        User currentUser = securityUtils.getCurrentUser();
+        Invoice invoice = invoiceRepository.findByIdAndUser(id, currentUser)
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
         return invoiceMapper.toDto(invoice);
     }
 
     @Transactional
     public void deleteInvoice(Long id) {
-        Invoice invoice = invoiceRepository.findById(id)
+        User currentUser = securityUtils.getCurrentUser();
+        Invoice invoice = invoiceRepository.findByIdAndUser(id, currentUser)
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
         
         // Restore product stock

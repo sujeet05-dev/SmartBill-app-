@@ -1,7 +1,10 @@
 package com.smartbill.repository;
 
 import com.smartbill.entity.Invoice;
+import com.smartbill.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -10,6 +13,11 @@ import java.util.Optional;
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     Optional<Invoice> findByInvoiceNumber(String invoiceNumber);
-    List<Invoice> findAllByOrderByDateDesc();
-    List<Invoice> findByInvoiceNumberContainingIgnoreCaseOrCustomerNameContainingIgnoreCaseOrderByDateDesc(String invoiceNumber, String customerName);
+    
+    List<Invoice> findByUserOrderByDateDesc(User user);
+
+    Optional<Invoice> findByIdAndUser(Long id, User user);
+
+    @Query("SELECT i FROM Invoice i WHERE i.user = :user AND (LOWER(i.invoiceNumber) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(i.customerName) LIKE LOWER(CONCAT('%', :search, '%'))) ORDER BY i.date DESC")
+    List<Invoice> searchByUser(@Param("user") User user, @Param("search") String search);
 }

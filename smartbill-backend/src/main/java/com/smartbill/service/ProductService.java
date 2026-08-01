@@ -2,32 +2,36 @@ package com.smartbill.service;
 
 import com.smartbill.dto.ProductDto;
 import com.smartbill.entity.Product;
+import com.smartbill.entity.User;
 import com.smartbill.mapper.ProductMapper;
 import com.smartbill.repository.ProductRepository;
+import com.smartbill.security.SecurityUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+    private final SecurityUtils securityUtils;
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper) {
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, SecurityUtils securityUtils) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
+        this.securityUtils = securityUtils;
     }
 
     public List<ProductDto> getAllProducts(String search) {
+        User currentUser = securityUtils.getCurrentUser();
         List<Product> products;
         if (search != null && !search.trim().isEmpty()) {
-            products = productRepository.findByNameContainingIgnoreCaseOrBrandContainingIgnoreCaseOrSkuContainingIgnoreCase(search, search, search);
+            products = productRepository.searchByUser(currentUser, search.trim());
         } else {
-            products = productRepository.findAll();
+            products = productRepository.findByUser(currentUser);
         }
         return products.stream()
                 .map(productMapper::toDto)
@@ -35,13 +39,16 @@ public class ProductService {
     }
 
     public ProductDto createProduct(ProductDto productDto) {
+        User currentUser = securityUtils.getCurrentUser();
         Product product = productMapper.toEntity(productDto);
+        product.setUser(currentUser);
         Product saved = productRepository.save(product);
         return productMapper.toDto(saved);
     }
 
     public ProductDto updateProduct(Long id, ProductDto productDto) {
-        Product existing = productRepository.findById(id)
+        User currentUser = securityUtils.getCurrentUser();
+        Product existing = productRepository.findByIdAndUser(id, currentUser)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         
         existing.setName(productDto.getName());
@@ -58,10 +65,11 @@ public class ProductService {
 
     @Transactional
     public void deleteProduct(Long id) {
-        if (!productRepository.existsById(id)) {
-            throw new RuntimeException("Product not found");
-        }
-        productRepository.deleteInvoiceItemsByProductId(id);
-        productRepository.deleteById(id);
+        User currentUser = securityUtils.getCurrentUser();
+        Product existing = productRepository.findByIdAndUser(id, currentUser)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        productRepository.deleteInvoiceItemsByProductIdAndUser(existing.getId(), currentUser);
+        productRepository.delete(existing);
     }
 }

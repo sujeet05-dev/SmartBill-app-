@@ -42,6 +42,10 @@ public class Invoice {
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InvoiceItem> items = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     public Invoice() {}
 
     // Getters and Setters
@@ -80,4 +84,7 @@ public class Invoice {
             item.setInvoice(this);
         }
     }
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }
