@@ -14,26 +14,29 @@ public class ShopMapper {
         dto.setName(shop.getName());
         dto.setOwnerName(shop.getOwnerName());
         dto.setAddress(shop.getAddress());
+        dto.setState(shop.getState());
+        dto.setPincode(shop.getPincode());
         dto.setPhone(shop.getPhone());
         dto.setEmail(shop.getEmail());
         dto.setGstin(shop.getGstin());
         dto.setLogoUrl(shop.getLogoUrl());
+        dto.setTermsAndConditions(shop.getTermsAndConditions());
         return dto;
     }
 
     public Shop toEntity(ShopDto dto) {
         if (dto == null) return null;
         Shop shop = new Shop();
-        if (dto.getId() != null && dto.getId() != 0) {
-            shop.setId(dto.getId());
-        }
         shop.setName(dto.getName());
         shop.setOwnerName(dto.getOwnerName());
         shop.setAddress(dto.getAddress());
+        shop.setState(dto.getState());
+        shop.setPincode(dto.getPincode());
         shop.setPhone(dto.getPhone());
         shop.setEmail(dto.getEmail());
         shop.setGstin(dto.getGstin());
         shop.setLogoUrl(dto.getLogoUrl());
+        shop.setTermsAndConditions(dto.getTermsAndConditions());
         return shop;
     }
 }

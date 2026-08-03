@@ -10,9 +10,12 @@ import { productService, type Product } from '@/services/products';
 
 const productSchema = z.object({
   name: z.string().min(1, 'Product name is required'),
+  description: z.string().optional(),
   brand: z.string().min(1, 'Brand is required'),
   category: z.string().min(1, 'Category is required'),
   sku: z.string().optional(),
+  imeiNumber: z.string().optional(),
+  unit: z.string().optional(),
   price: z.preprocess((val) => Number(val), z.number().min(0, 'Price must be positive')),
   gstPercentage: z.preprocess((val) => Number(val), z.number().min(0).max(100, 'GST must be between 0 and 100')),
   stock: z.preprocess((val) => Number(val), z.number().int().min(0, 'Stock cannot be negative')),
@@ -51,12 +54,15 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
       } else {
         reset({
           name: '',
+          description: '',
           brand: '',
           category: '',
           price: 0,
           gstPercentage: 18,
           stock: 0,
-          sku: ''
+          sku: '',
+          imeiNumber: '',
+          unit: 'PCS'
         });
       }
     }
@@ -68,9 +74,12 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
       const payload: Product = {
         id: product?.id || 0,
         name: data.name,
+        description: data.description,
         brand: data.brand,
         category: data.category,
         sku: data.sku || '',
+        imeiNumber: data.imeiNumber || '',
+        unit: data.unit || 'PCS',
         price: data.price,
         gstPercentage: data.gstPercentage,
         stock: data.stock,
@@ -105,6 +114,14 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
               label="Product Name"
               {...register('name')}
               error={errors.name?.message as string}
+            />
+          </div>
+          
+          <div className="sm:col-span-2">
+            <Input
+              label="Description (Optional)"
+              {...register('description')}
+              error={errors.description?.message as string}
             />
           </div>
           
@@ -151,6 +168,30 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             {...register('sku')}
             error={errors.sku?.message as string}
           />
+
+          <Input
+            label="IMEI/Serial No (Optional)"
+            {...register('imeiNumber')}
+            error={errors.imeiNumber?.message as string}
+          />
+
+          <div>
+            <label className="block text-sm font-medium leading-6 text-slate-900 mb-2">
+              Unit
+            </label>
+            <select
+              {...register('unit')}
+              className="block w-full rounded-md border-0 py-1.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 px-3 bg-white h-9"
+            >
+              <option value="PCS">Pieces (PCS)</option>
+              <option value="KG">Kilograms (KG)</option>
+              <option value="GM">Grams (GM)</option>
+              <option value="LTR">Liters (LTR)</option>
+              <option value="BOX">Box (BOX)</option>
+              <option value="SET">Set (SET)</option>
+              <option value="MTR">Meters (MTR)</option>
+            </select>
+          </div>
         </div>
 
         <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">

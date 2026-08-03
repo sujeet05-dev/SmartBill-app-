@@ -17,6 +17,10 @@ public class ShopDto {
     @NotBlank(message = "Address is required")
     private String address;
 
+    private String state;
+
+    private String pincode;
+
     @NotBlank(message = "Phone number is required")
     @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be 10 digits")
     private String phone;
@@ -29,6 +33,8 @@ public class ShopDto {
     private String gstin;
 
     private String logoUrl;
+
+    private String termsAndConditions;
 
     public ShopDto() {}
 
@@ -45,6 +51,12 @@ public class ShopDto {
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
 
+    public String getState() { return state; }
+    public void setState(String state) { this.state = state; }
+
+    public String getPincode() { return pincode; }
+    public void setPincode(String pincode) { this.pincode = pincode; }
+
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
 
@@ -56,4 +68,7 @@ public class ShopDto {
 
     public String getLogoUrl() { return logoUrl; }
     public void setLogoUrl(String logoUrl) { this.logoUrl = logoUrl; }
+
+    public String getTermsAndConditions() { return termsAndConditions; }
+    public void setTermsAndConditions(String termsAndConditions) { this.termsAndConditions = termsAndConditions; }
 }

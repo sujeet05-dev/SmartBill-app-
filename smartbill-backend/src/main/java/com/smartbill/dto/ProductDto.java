@@ -12,6 +12,8 @@ public class ProductDto {
     @NotBlank(message = "Product name is required")
     private String name;
 
+    private String description;
+
     @NotBlank(message = "Brand is required")
     private String brand;
 
@@ -32,7 +34,13 @@ public class ProductDto {
 
     private String sku;
 
-    public ProductDto() {}
+    private String imeiNumber;
+
+    private String unit;
+
+    public ProductDto() {
+        this.unit = "PCS";
+    }
 
     // Getters and Setters
 
@@ -41,6 +49,9 @@ public class ProductDto {
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
     public String getBrand() { return brand; }
     public void setBrand(String brand) { this.brand = brand; }
@@ -59,4 +70,10 @@ public class ProductDto {
 
     public String getSku() { return sku; }
     public void setSku(String sku) { this.sku = sku; }
+
+    public String getImeiNumber() { return imeiNumber; }
+    public void setImeiNumber(String imeiNumber) { this.imeiNumber = imeiNumber; }
+
+    public String getUnit() { return unit; }
+    public void setUnit(String unit) { this.unit = unit; }
 }

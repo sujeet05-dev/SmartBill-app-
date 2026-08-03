@@ -3,12 +3,15 @@ import api from './api';
 export interface Product {
   id?: number;
   name: string;
+  description?: string;
   brand: string;
   category: string;
   price: number;
   gstPercentage: number;
   stock: number;
   sku?: string;
+  imeiNumber?: string;
+  unit?: string;
 }
 
 export const productService = {

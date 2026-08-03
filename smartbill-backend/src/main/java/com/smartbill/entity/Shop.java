@@ -19,6 +19,12 @@ public class Shop {
     @Column(nullable = false)
     private String address;
 
+    @Column
+    private String state;
+
+    @Column
+    private String pincode;
+
     @Column(nullable = false)
     private String phone;
 
@@ -30,6 +36,9 @@ public class Shop {
 
     @Column(columnDefinition = "TEXT")
     private String logoUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String termsAndConditions;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -50,6 +59,12 @@ public class Shop {
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
 
+    public String getState() { return state; }
+    public void setState(String state) { this.state = state; }
+
+    public String getPincode() { return pincode; }
+    public void setPincode(String pincode) { this.pincode = pincode; }
+
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
 
@@ -61,6 +76,9 @@ public class Shop {
 
     public String getLogoUrl() { return logoUrl; }
     public void setLogoUrl(String logoUrl) { this.logoUrl = logoUrl; }
+
+    public String getTermsAndConditions() { return termsAndConditions; }
+    public void setTermsAndConditions(String termsAndConditions) { this.termsAndConditions = termsAndConditions; }
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }

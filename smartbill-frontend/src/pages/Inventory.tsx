@@ -105,8 +105,9 @@ export const Inventory: React.FC = () => {
               products.map((product) => (
                 <tr key={product.id}>
                   <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-slate-900 sm:pl-0">
-                    {product.name}
+                    <div>{product.name}</div>
                     {product.sku && <div className="text-xs text-slate-500">SKU: {product.sku}</div>}
+                    {product.imeiNumber && <div className="text-xs text-slate-500">IMEI: {product.imeiNumber}</div>}
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-500">{product.brand}</td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-500">{product.category}</td>
@@ -117,7 +118,7 @@ export const Inventory: React.FC = () => {
                       product.stock > 0 ? 'bg-yellow-50 text-yellow-800 ring-yellow-600/20' : 
                       'bg-red-50 text-red-700 ring-red-600/10'
                     }`}>
-                      {product.stock > 0 ? product.stock : 'Out of Stock'}
+                      {product.stock > 0 ? `${product.stock} ${product.unit || 'PCS'}` : 'Out of Stock'}
                     </span>
                   </td>
                   <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">

@@ -52,12 +52,15 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         
         existing.setName(productDto.getName());
+        existing.setDescription(productDto.getDescription());
         existing.setBrand(productDto.getBrand());
         existing.setCategory(productDto.getCategory());
         existing.setPrice(productDto.getPrice());
         existing.setGstPercentage(productDto.getGstPercentage());
         existing.setStock(productDto.getStock());
         existing.setSku(productDto.getSku());
+        existing.setImeiNumber(productDto.getImeiNumber());
+        existing.setUnit(productDto.getUnit() != null ? productDto.getUnit() : "PCS");
 
         Product saved = productRepository.save(existing);
         return productMapper.toDto(saved);

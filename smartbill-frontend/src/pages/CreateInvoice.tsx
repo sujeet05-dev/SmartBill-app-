@@ -110,7 +110,7 @@ export const CreateInvoice: React.FC = () => {
         {/* Customer Details */}
         <div className="bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-medium text-slate-900 mb-4">Customer Details</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Input
               label="Customer Name (Optional)"
               {...register('customerName')}
@@ -132,6 +132,13 @@ export const CreateInvoice: React.FC = () => {
                 <option value="UPI">UPI</option>
               </select>
             </div>
+            <Input
+              label="Received Amount (₹)"
+              type="number"
+              step="0.01"
+              min="0"
+              {...register('receivedAmount', { valueAsNumber: true })}
+            />
           </div>
         </div>
 
@@ -239,16 +246,20 @@ export const CreateInvoice: React.FC = () => {
         <div className="bg-white shadow rounded-lg p-6">
           <div className="flex flex-col md:flex-row justify-end space-y-4 md:space-y-0 md:space-x-12">
             <div className="space-y-3 text-right">
-              <div className="text-sm text-slate-500 flex justify-between w-48">
-                <span>Subtotal:</span>
+              <div className="text-sm text-slate-500 flex justify-between w-56">
+                <span>Taxable Amount:</span>
                 <span className="text-slate-900">₹{totals.subTotal.toFixed(2)}</span>
               </div>
-              <div className="text-sm text-slate-500 flex justify-between w-48">
-                <span>Total GST:</span>
-                <span className="text-slate-900">₹{totals.totalGst.toFixed(2)}</span>
+              <div className="text-sm text-slate-500 flex justify-between w-56">
+                <span>CGST:</span>
+                <span className="text-slate-900">₹{(totals.totalGst / 2).toFixed(2)}</span>
               </div>
-              <div className="text-lg font-bold text-slate-900 flex justify-between w-48 border-t pt-3 mt-3">
-                <span>Grand Total:</span>
+              <div className="text-sm text-slate-500 flex justify-between w-56">
+                <span>SGST:</span>
+                <span className="text-slate-900">₹{(totals.totalGst / 2).toFixed(2)}</span>
+              </div>
+              <div className="text-lg font-bold text-slate-900 flex justify-between w-56 border-t pt-3 mt-3">
+                <span>Total Amount:</span>
                 <span>₹{totals.grandTotal.toFixed(2)}</span>
               </div>
             </div>

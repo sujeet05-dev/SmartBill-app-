@@ -10,6 +10,7 @@ export interface InvoiceCreate {
   customerName?: string;
   customerMobile?: string;
   paymentMethod: 'CASH' | 'CARD' | 'UPI';
+  receivedAmount?: number;
   items: InvoiceItemCreate[];
 }
 
@@ -27,12 +28,18 @@ export interface InvoiceResponse {
   id: number;
   invoiceNumber: string;
   date: string;
+  dueDate: string;
+  placeOfSupply?: string;
   customerName: string;
   customerMobile: string;
   paymentMethod: string;
   subTotal: number;
   totalGst: number;
+  cgstAmount: number;
+  sgstAmount: number;
   grandTotal: number;
+  receivedAmount: number;
+  amountInWords: string;
   items: InvoiceItemResponse[];
 }
 

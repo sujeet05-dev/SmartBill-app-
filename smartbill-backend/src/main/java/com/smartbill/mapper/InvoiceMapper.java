@@ -23,12 +23,18 @@ public class InvoiceMapper {
         dto.setId(invoice.getId());
         dto.setInvoiceNumber(invoice.getInvoiceNumber());
         dto.setDate(invoice.getDate());
+        dto.setDueDate(invoice.getDueDate());
         dto.setCustomerName(invoice.getCustomerName());
         dto.setCustomerMobile(invoice.getCustomerMobile());
+        dto.setPlaceOfSupply(invoice.getPlaceOfSupply());
         dto.setPaymentMethod(invoice.getPaymentMethod());
         dto.setSubTotal(invoice.getSubTotal());
         dto.setTotalGst(invoice.getTotalGst());
+        dto.setCgstAmount(invoice.getCgstAmount());
+        dto.setSgstAmount(invoice.getSgstAmount());
         dto.setGrandTotal(invoice.getGrandTotal());
+        dto.setReceivedAmount(invoice.getReceivedAmount());
+        dto.setAmountInWords(invoice.getAmountInWords());
 
         if (invoice.getItems() != null) {
             dto.setItems(invoice.getItems().stream().map(this::toItemDto).collect(Collectors.toList()));

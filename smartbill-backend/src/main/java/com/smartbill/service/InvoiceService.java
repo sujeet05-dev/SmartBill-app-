@@ -1,22 +1,18 @@
 package com.smartbill.service;
 
-import com.smartbill.dto.InvoiceCreateDto;
-import com.smartbill.dto.InvoiceDto;
-import com.smartbill.dto.InvoiceItemCreateDto;
-import com.smartbill.dto.MonthlySummaryDto;
-import com.smartbill.entity.Invoice;
-import com.smartbill.entity.InvoiceItem;
-import com.smartbill.entity.Product;
-import com.smartbill.entity.User;
+import com.smartbill.dto.*;
+import com.smartbill.entity.*;
 import com.smartbill.mapper.InvoiceMapper;
 import com.smartbill.repository.InvoiceRepository;
 import com.smartbill.repository.ProductRepository;
 import com.smartbill.security.SecurityUtils;
+import com.smartbill.util.NumberToWordsConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -29,12 +25,14 @@ public class InvoiceService {
     private final ProductRepository productRepository;
     private final InvoiceMapper invoiceMapper;
     private final SecurityUtils securityUtils;
+    private final ShopService shopService;
 
-    public InvoiceService(InvoiceRepository invoiceRepository, ProductRepository productRepository, InvoiceMapper invoiceMapper, SecurityUtils securityUtils) {
+    public InvoiceService(InvoiceRepository invoiceRepository, ProductRepository productRepository, InvoiceMapper invoiceMapper, SecurityUtils securityUtils, ShopService shopService) {
         this.invoiceRepository = invoiceRepository;
         this.productRepository = productRepository;
         this.invoiceMapper = invoiceMapper;
         this.securityUtils = securityUtils;
+        this.shopService = shopService;
     }
 
     @Transactional
@@ -45,10 +43,22 @@ public class InvoiceService {
         invoice.setCustomerName(createDto.getCustomerName());
         invoice.setCustomerMobile(createDto.getCustomerMobile());
         invoice.setPaymentMethod(createDto.getPaymentMethod());
-        invoice.setDate(LocalDateTime.now());
         
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        LocalDateTime now = LocalDateTime.now();
+        invoice.setDate(now);
+        invoice.setDueDate(now.toLocalDate().plusDays(7));
+
+        // Auto-fill place of supply from shop state
+        ShopDto shop = shopService.getShop();
+        if (shop != null && shop.getState() != null) {
+            invoice.setPlaceOfSupply(shop.getState());
+        }
+        
+        String timestamp = now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
         invoice.setInvoiceNumber("INV-" + timestamp);
+
+        // Set received amount
+        invoice.setReceivedAmount(createDto.getReceivedAmount() != null ? createDto.getReceivedAmount() : BigDecimal.ZERO);
 
         BigDecimal subTotal = BigDecimal.ZERO;
         BigDecimal totalGst = BigDecimal.ZERO;
@@ -86,9 +96,19 @@ public class InvoiceService {
             items.add(item);
         }
 
+        // CGST and SGST split (each = total GST / 2)
+        BigDecimal cgst = totalGst.divide(new BigDecimal(2), 2, RoundingMode.HALF_UP);
+        BigDecimal sgst = totalGst.subtract(cgst);
+
         invoice.setSubTotal(subTotal);
         invoice.setTotalGst(totalGst);
+        invoice.setCgstAmount(cgst);
+        invoice.setSgstAmount(sgst);
         invoice.setGrandTotal(subTotal.add(totalGst));
+
+        // Amount in words
+        invoice.setAmountInWords(NumberToWordsConverter.convert(invoice.getGrandTotal()));
+
         invoice.setItems(items);
 
         Invoice saved = invoiceRepository.save(invoice);

@@ -42,10 +42,13 @@ public class ShopService {
             shop.setName(shopDto.getName());
             shop.setOwnerName(shopDto.getOwnerName());
             shop.setAddress(shopDto.getAddress());
+            shop.setState(shopDto.getState());
+            shop.setPincode(shopDto.getPincode());
             shop.setPhone(shopDto.getPhone());
             shop.setEmail(shopDto.getEmail());
             shop.setGstin(shopDto.getGstin());
             shop.setLogoUrl(shopDto.getLogoUrl());
+            shop.setTermsAndConditions(shopDto.getTermsAndConditions());
         }
         
         Shop saved = shopRepository.save(shop);

@@ -11,10 +11,13 @@ const shopSchema = z.object({
   name: z.string().min(1, 'Shop Name is required'),
   ownerName: z.string().min(1, 'Owner Name is required'),
   address: z.string().min(1, 'Address is required'),
+  state: z.string().optional(),
+  pincode: z.string().optional(),
   phone: z.string().min(10, 'Valid phone number is required'),
   email: z.string().email('Invalid email').optional().or(z.literal('')),
   gstin: z.string().min(15, 'GSTIN must be 15 characters').max(15),
   logoUrl: z.string().url('Invalid URL').optional().or(z.literal('')),
+  termsAndConditions: z.string().optional(),
 });
 
 export const ShopProfile: React.FC = () => {
@@ -89,6 +92,17 @@ export const ShopProfile: React.FC = () => {
             />
           </div>
           <Input
+            label="State"
+            placeholder="e.g. Uttar Pradesh"
+            {...register('state')}
+            error={errors.state?.message}
+          />
+          <Input
+            label="Pincode"
+            {...register('pincode')}
+            error={errors.pincode?.message}
+          />
+          <Input
             label="Phone Number"
             {...register('phone', { 
               required: 'Phone number is required',
@@ -119,6 +133,17 @@ export const ShopProfile: React.FC = () => {
             {...register('logoUrl')}
             error={errors.logoUrl?.message}
           />
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium leading-6 text-slate-900 mb-2">
+              Terms & Conditions
+            </label>
+            <textarea
+              {...register('termsAndConditions')}
+              rows={4}
+              className="block w-full rounded-md border-0 py-1.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+              placeholder="1. Goods once sold..."
+            />
+          </div>
         </div>
 
         <div className="flex justify-end">

@@ -5,10 +5,13 @@ export interface Shop {
   name: string;
   ownerName: string;
   address: string;
+  state?: string;
+  pincode?: string;
   phone: string;
   email?: string;
   gstin: string;
   logoUrl?: string;
+  termsAndConditions?: string;
 }
 
 export const shopService = {
