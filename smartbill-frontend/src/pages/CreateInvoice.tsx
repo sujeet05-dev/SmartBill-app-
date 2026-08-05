@@ -70,7 +70,8 @@ export const CreateInvoice: React.FC = () => {
 
       const items = data.items.map(item => ({
         productId: Number(item.productId),
-        quantity: Number(item.quantity)
+        quantity: Number(item.quantity),
+        selectedImeis: item.selectedImeis || []
       }));
 
       // Find any items that don't have enough stock
@@ -81,6 +82,28 @@ export const CreateInvoice: React.FC = () => {
 
       if (invalidItems.length > 0) {
         toast.error('One or more selected products have insufficient stock.');
+        setIsLoading(false);
+        return;
+      }
+
+      const invalidImeis = items.filter(item => {
+        const product = products.find(p => p.id === item.productId);
+        
+        // If product has available IMEIs, they MUST select exactly 'quantity' IMEIs
+        if (product && product.availableImeis && product.availableImeis.length > 0) {
+          return !item.selectedImeis || item.selectedImeis.length !== item.quantity;
+        }
+        
+        // If they selected IMEIs anyway, it must match quantity
+        if (item.selectedImeis && item.selectedImeis.length > 0) {
+          return item.selectedImeis.length !== item.quantity;
+        }
+        
+        return false;
+      });
+
+      if (invalidImeis.length > 0) {
+        toast.error('The number of selected IMEIs must match the quantity for the product.');
         setIsLoading(false);
         return;
       }
@@ -195,6 +218,24 @@ export const CreateInvoice: React.FC = () => {
                             </option>
                           ))}
                         </select>
+                        {selectedProduct?.availableImeis && selectedProduct.availableImeis.length > 0 && (
+                          <div className="mt-2">
+                            <label className="block text-xs font-medium text-slate-700 mb-1">
+                              Select IMEIs ({watchItems[index]?.selectedImeis?.length || 0}/{qty})
+                            </label>
+                            <select
+                              multiple
+                              className="block w-full rounded-md border-0 py-1.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 sm:text-xs px-2 bg-white"
+                              {...register(`items.${index}.selectedImeis` as const)}
+                              size={Math.min(3, selectedProduct.availableImeis.length)}
+                            >
+                              {selectedProduct.availableImeis.map(imei => (
+                                <option key={imei} value={imei}>{imei}</option>
+                              ))}
+                            </select>
+                            <p className="text-[10px] text-slate-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+                          </div>
+                        )}
                       </td>
                       <td className="py-3 px-3">
                         <Input

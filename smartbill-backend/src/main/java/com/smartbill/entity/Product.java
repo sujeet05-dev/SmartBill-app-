@@ -2,6 +2,8 @@ package com.smartbill.entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -35,8 +37,10 @@ public class Product {
     @Column
     private String sku;
 
-    @Column
-    private String imeiNumber;
+    @ElementCollection
+    @CollectionTable(name = "product_imeis", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "imei")
+    private List<String> availableImeis = new ArrayList<>();
 
     @Column
     private String unit;
@@ -78,8 +82,8 @@ public class Product {
     public String getSku() { return sku; }
     public void setSku(String sku) { this.sku = sku; }
 
-    public String getImeiNumber() { return imeiNumber; }
-    public void setImeiNumber(String imeiNumber) { this.imeiNumber = imeiNumber; }
+    public List<String> getAvailableImeis() { return availableImeis; }
+    public void setAvailableImeis(List<String> availableImeis) { this.availableImeis = availableImeis; }
 
     public String getUnit() { return unit; }
     public void setUnit(String unit) { this.unit = unit; }

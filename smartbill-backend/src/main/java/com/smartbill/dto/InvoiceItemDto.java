@@ -1,6 +1,7 @@
 package com.smartbill.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class InvoiceItemDto {
     private Long id;
@@ -10,6 +11,7 @@ public class InvoiceItemDto {
     private Double gstPercentage;
     private BigDecimal gstAmount;
     private BigDecimal totalAmount;
+    private List<String> selectedImeis;
 
     // Getters and Setters
     public Long getId() { return id; }
@@ -32,4 +34,7 @@ public class InvoiceItemDto {
     
     public BigDecimal getTotalAmount() { return totalAmount; }
     public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
+    
+    public List<String> getSelectedImeis() { return selectedImeis; }
+    public void setSelectedImeis(List<String> selectedImeis) { this.selectedImeis = selectedImeis; }
 }

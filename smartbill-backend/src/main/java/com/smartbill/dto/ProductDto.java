@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.List;
 
 public class ProductDto {
 
@@ -34,7 +35,7 @@ public class ProductDto {
 
     private String sku;
 
-    private String imeiNumber;
+    private List<String> availableImeis;
 
     private String unit;
 
@@ -71,8 +72,8 @@ public class ProductDto {
     public String getSku() { return sku; }
     public void setSku(String sku) { this.sku = sku; }
 
-    public String getImeiNumber() { return imeiNumber; }
-    public void setImeiNumber(String imeiNumber) { this.imeiNumber = imeiNumber; }
+    public List<String> getAvailableImeis() { return availableImeis; }
+    public void setAvailableImeis(List<String> availableImeis) { this.availableImeis = availableImeis; }
 
     public String getUnit() { return unit; }
     public void setUnit(String unit) { this.unit = unit; }

@@ -14,7 +14,7 @@ const productSchema = z.object({
   brand: z.string().min(1, 'Brand is required'),
   category: z.string().min(1, 'Category is required'),
   sku: z.string().optional(),
-  imeiNumber: z.string().optional(),
+  imeisText: z.string().optional(),
   unit: z.string().optional(),
   price: z.preprocess((val) => Number(val), z.number().min(0, 'Price must be positive')),
   gstPercentage: z.preprocess((val) => Number(val), z.number().min(0).max(100, 'GST must be between 0 and 100')),
@@ -50,7 +50,10 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       if (product) {
-        reset(product);
+        reset({
+          ...product,
+          imeisText: product.availableImeis ? product.availableImeis.join('\n') : ''
+        });
       } else {
         reset({
           name: '',
@@ -61,7 +64,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
           gstPercentage: 18,
           stock: 0,
           sku: '',
-          imeiNumber: '',
+          imeisText: '',
           unit: 'PCS'
         });
       }
@@ -71,6 +74,17 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
   const onSubmit = async (data: any) => {
     try {
       setIsLoading(true);
+
+      const parsedImeis = data.imeisText 
+        ? data.imeisText.split(/[\n,]+/).map((i: string) => i.trim()).filter((i: string) => i.length > 0)
+        : [];
+        
+      if (parsedImeis.length > data.stock) {
+        toast.error(`You entered ${parsedImeis.length} IMEIs, but stock is only ${data.stock}.`);
+        setIsLoading(false);
+        return;
+      }
+
       const payload: Product = {
         id: product?.id || 0,
         name: data.name,
@@ -78,7 +92,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
         brand: data.brand,
         category: data.category,
         sku: data.sku || '',
-        imeiNumber: data.imeiNumber || '',
+        availableImeis: parsedImeis,
         unit: data.unit || 'PCS',
         price: data.price,
         gstPercentage: data.gstPercentage,
@@ -169,11 +183,21 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             error={errors.sku?.message as string}
           />
 
-          <Input
-            label="IMEI/Serial No (Optional)"
-            {...register('imeiNumber')}
-            error={errors.imeiNumber?.message as string}
-          />
+          <div className="sm:col-span-2">
+            <label className="block text-sm font-medium leading-6 text-slate-900 mb-2">
+              IMEIs / Serial Numbers (Optional)
+            </label>
+            <p className="text-xs text-slate-500 mb-2">Enter IMEIs separated by commas or new lines. Count must not exceed stock.</p>
+            <textarea
+              {...register('imeisText')}
+              rows={3}
+              className="block w-full rounded-md border-0 py-1.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+              placeholder="123456789012345, 987654321098765&#10;..."
+            />
+            {errors.imeisText?.message && (
+              <p className="mt-2 text-sm text-red-600">{errors.imeisText.message as string}</p>
+            )}
+          </div>
 
           <div>
             <label className="block text-sm font-medium leading-6 text-slate-900 mb-2">

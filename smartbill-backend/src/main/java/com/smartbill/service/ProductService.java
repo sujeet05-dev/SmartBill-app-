@@ -59,7 +59,12 @@ public class ProductService {
         existing.setGstPercentage(productDto.getGstPercentage());
         existing.setStock(productDto.getStock());
         existing.setSku(productDto.getSku());
-        existing.setImeiNumber(productDto.getImeiNumber());
+        if (productDto.getAvailableImeis() != null) {
+            existing.getAvailableImeis().clear();
+            existing.getAvailableImeis().addAll(productDto.getAvailableImeis());
+        } else {
+            existing.getAvailableImeis().clear();
+        }
         existing.setUnit(productDto.getUnit() != null ? productDto.getUnit() : "PCS");
 
         Product saved = productRepository.save(existing);

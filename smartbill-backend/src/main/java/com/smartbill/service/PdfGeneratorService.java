@@ -173,8 +173,8 @@ public class PdfGeneratorService {
                 }
                 nameCell.addElement(new Paragraph(productName, boldFont));
                 
-                if (item.getProduct().getImeiNumber() != null && !item.getProduct().getImeiNumber().isEmpty()) {
-                    nameCell.addElement(new Paragraph("IMEI/Serial No: " + item.getProduct().getImeiNumber(), smallFont));
+                if (item.getSelectedImeis() != null && !item.getSelectedImeis().isEmpty()) {
+                    nameCell.addElement(new Paragraph("IMEI/Serial No: " + String.join(", ", item.getSelectedImeis()), smallFont));
                 }
                 itemsTable.addCell(nameCell);
 

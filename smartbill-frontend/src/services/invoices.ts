@@ -4,6 +4,7 @@ import { type Product } from './products';
 export interface InvoiceItemCreate {
   productId: number;
   quantity: number;
+  selectedImeis?: string[];
 }
 
 export interface InvoiceCreate {
@@ -22,6 +23,7 @@ export interface InvoiceItemResponse {
   gstPercentage: number;
   gstAmount: number;
   totalAmount: number;
+  selectedImeis?: string[];
 }
 
 export interface InvoiceResponse {

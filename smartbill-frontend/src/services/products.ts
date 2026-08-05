@@ -10,7 +10,7 @@ export interface Product {
   gstPercentage: number;
   stock: number;
   sku?: string;
-  imeiNumber?: string;
+  availableImeis?: string[];
   unit?: string;
 }
 

@@ -4,6 +4,8 @@ import com.smartbill.dto.ProductDto;
 import com.smartbill.entity.Product;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+
 @Component
 public class ProductMapper {
 
@@ -19,7 +21,7 @@ public class ProductMapper {
         dto.setGstPercentage(product.getGstPercentage());
         dto.setStock(product.getStock());
         dto.setSku(product.getSku());
-        dto.setImeiNumber(product.getImeiNumber());
+        dto.setAvailableImeis(product.getAvailableImeis() != null ? new ArrayList<>(product.getAvailableImeis()) : null);
         dto.setUnit(product.getUnit());
         return dto;
     }
@@ -38,7 +40,7 @@ public class ProductMapper {
         product.setGstPercentage(dto.getGstPercentage());
         product.setStock(dto.getStock());
         product.setSku(dto.getSku());
-        product.setImeiNumber(dto.getImeiNumber());
+        product.setAvailableImeis(dto.getAvailableImeis() != null ? new ArrayList<>(dto.getAvailableImeis()) : new ArrayList<>());
         product.setUnit(dto.getUnit() != null ? dto.getUnit() : "PCS");
         return product;
     }

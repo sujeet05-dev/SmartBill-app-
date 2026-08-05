@@ -53,6 +53,7 @@ public class InvoiceMapper {
         dto.setGstPercentage(item.getGstPercentage());
         dto.setGstAmount(item.getGstAmount());
         dto.setTotalAmount(item.getTotalAmount());
+        dto.setSelectedImeis(item.getSelectedImeis() != null ? new java.util.ArrayList<>(item.getSelectedImeis()) : null);
         return dto;
     }
 }

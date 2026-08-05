@@ -2,6 +2,7 @@ package com.smartbill.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 
 public class InvoiceItemCreateDto {
 
@@ -12,6 +13,8 @@ public class InvoiceItemCreateDto {
     @Min(value = 1, message = "Quantity must be at least 1")
     private Integer quantity;
 
+    private List<String> selectedImeis;
+
     public InvoiceItemCreateDto() {}
 
     public Long getProductId() { return productId; }
@@ -19,4 +22,7 @@ public class InvoiceItemCreateDto {
 
     public Integer getQuantity() { return quantity; }
     public void setQuantity(Integer quantity) { this.quantity = quantity; }
+
+    public List<String> getSelectedImeis() { return selectedImeis; }
+    public void setSelectedImeis(List<String> selectedImeis) { this.selectedImeis = selectedImeis; }
 }

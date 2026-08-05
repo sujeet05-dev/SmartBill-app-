@@ -73,6 +73,20 @@ public class InvoiceService {
                 throw new RuntimeException("Insufficient stock for product: " + product.getName() + ". Available: " + product.getStock());
             }
 
+            // Validate and handle IMEIs
+            List<String> selectedImeis = itemDto.getSelectedImeis();
+            if (selectedImeis != null && !selectedImeis.isEmpty()) {
+                if (selectedImeis.size() != itemDto.getQuantity()) {
+                    throw new RuntimeException("Number of selected IMEIs must match the quantity for product: " + product.getName());
+                }
+                for (String imei : selectedImeis) {
+                    if (!product.getAvailableImeis().contains(imei)) {
+                        throw new RuntimeException("IMEI " + imei + " is not available for product: " + product.getName());
+                    }
+                }
+                product.getAvailableImeis().removeAll(selectedImeis);
+            }
+
             // Reduce stock
             product.setStock(product.getStock() - itemDto.getQuantity());
             productRepository.save(product);
@@ -82,6 +96,9 @@ public class InvoiceService {
             item.setQuantity(itemDto.getQuantity());
             item.setUnitPrice(product.getPrice());
             item.setGstPercentage(product.getGstPercentage());
+            if (selectedImeis != null && !selectedImeis.isEmpty()) {
+                item.setSelectedImeis(new ArrayList<>(selectedImeis));
+            }
 
             BigDecimal itemTotalExGst = product.getPrice().multiply(new BigDecimal(itemDto.getQuantity()));
             BigDecimal itemGst = itemTotalExGst.multiply(new BigDecimal(product.getGstPercentage())).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
@@ -152,6 +169,9 @@ public class InvoiceService {
             Product product = item.getProduct();
             if (product != null) {
                 product.setStock(product.getStock() + item.getQuantity());
+                if (item.getSelectedImeis() != null && !item.getSelectedImeis().isEmpty()) {
+                    product.getAvailableImeis().addAll(item.getSelectedImeis());
+                }
                 productRepository.save(product);
             }
         }
