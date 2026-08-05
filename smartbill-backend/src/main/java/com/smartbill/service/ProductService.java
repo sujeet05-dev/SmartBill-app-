@@ -84,7 +84,11 @@ public class ProductService {
         Product existing = productRepository.findByIdAndUser(id, currentUser)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
+        productRepository.deleteInvoiceItemImeisByProductIdAndUser(existing.getId(), currentUser.getId());
+        productRepository.deleteInvoiceItemHsnCodesByProductIdAndUser(existing.getId(), currentUser.getId());
         productRepository.deleteInvoiceItemsByProductIdAndUser(existing.getId(), currentUser);
+        
+        // Let JPA handle deleting the product and its @ElementCollections (product_imeis and product_hsn_codes)
         productRepository.delete(existing);
     }
 }
