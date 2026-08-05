@@ -39,7 +39,7 @@ public class ProductDto {
 
     private String unit;
 
-    private String hsnCode;
+    private List<String> availableHsnCodes;
 
     public ProductDto() {
         this.unit = "PCS";
@@ -80,6 +80,6 @@ public class ProductDto {
     public String getUnit() { return unit; }
     public void setUnit(String unit) { this.unit = unit; }
 
-    public String getHsnCode() { return hsnCode; }
-    public void setHsnCode(String hsnCode) { this.hsnCode = hsnCode; }
+    public List<String> getAvailableHsnCodes() { return availableHsnCodes; }
+    public void setAvailableHsnCodes(List<String> availableHsnCodes) { this.availableHsnCodes = availableHsnCodes; }
 }

@@ -45,8 +45,10 @@ public class Product {
     @Column
     private String unit;
 
-    @Column
-    private String hsnCode;
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "product_hsn_codes", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "hsn_code")
+    private List<String> availableHsnCodes = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -91,8 +93,8 @@ public class Product {
     public String getUnit() { return unit; }
     public void setUnit(String unit) { this.unit = unit; }
 
-    public String getHsnCode() { return hsnCode; }
-    public void setHsnCode(String hsnCode) { this.hsnCode = hsnCode; }
+    public List<String> getAvailableHsnCodes() { return availableHsnCodes; }
+    public void setAvailableHsnCodes(List<String> availableHsnCodes) { this.availableHsnCodes = availableHsnCodes; }
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }

@@ -87,6 +87,20 @@ public class InvoiceService {
                 product.getAvailableImeis().removeAll(selectedImeis);
             }
 
+            // Validate and handle HSN Codes
+            List<String> selectedHsnCodes = itemDto.getSelectedHsnCodes();
+            if (selectedHsnCodes != null && !selectedHsnCodes.isEmpty()) {
+                if (selectedHsnCodes.size() != itemDto.getQuantity()) {
+                    throw new RuntimeException("Number of selected HSN Codes must match the quantity for product: " + product.getName());
+                }
+                for (String hsn : selectedHsnCodes) {
+                    if (!product.getAvailableHsnCodes().contains(hsn)) {
+                        throw new RuntimeException("HSN Code " + hsn + " is not available for product: " + product.getName());
+                    }
+                }
+                product.getAvailableHsnCodes().removeAll(selectedHsnCodes);
+            }
+
             // Reduce stock
             product.setStock(product.getStock() - itemDto.getQuantity());
             productRepository.save(product);
@@ -98,6 +112,9 @@ public class InvoiceService {
             item.setGstPercentage(product.getGstPercentage());
             if (selectedImeis != null && !selectedImeis.isEmpty()) {
                 item.setSelectedImeis(new ArrayList<>(selectedImeis));
+            }
+            if (selectedHsnCodes != null && !selectedHsnCodes.isEmpty()) {
+                item.setSelectedHsnCodes(new ArrayList<>(selectedHsnCodes));
             }
 
             BigDecimal itemTotalExGst = product.getPrice().multiply(new BigDecimal(itemDto.getQuantity()));
@@ -171,6 +188,9 @@ public class InvoiceService {
                 product.setStock(product.getStock() + item.getQuantity());
                 if (item.getSelectedImeis() != null && !item.getSelectedImeis().isEmpty()) {
                     product.getAvailableImeis().addAll(item.getSelectedImeis());
+                }
+                if (item.getSelectedHsnCodes() != null && !item.getSelectedHsnCodes().isEmpty()) {
+                    product.getAvailableHsnCodes().addAll(item.getSelectedHsnCodes());
                 }
                 productRepository.save(product);
             }

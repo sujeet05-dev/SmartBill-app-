@@ -12,7 +12,7 @@ export interface Product {
   sku?: string;
   availableImeis?: string[];
   unit?: string;
-  hsnCode?: string;
+  availableHsnCodes?: string[];
 }
 
 export const productService = {

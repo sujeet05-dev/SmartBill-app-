@@ -54,6 +54,7 @@ public class InvoiceMapper {
         dto.setGstAmount(item.getGstAmount());
         dto.setTotalAmount(item.getTotalAmount());
         dto.setSelectedImeis(item.getSelectedImeis() != null ? new java.util.ArrayList<>(item.getSelectedImeis()) : null);
+        dto.setSelectedHsnCodes(item.getSelectedHsnCodes() != null ? new java.util.ArrayList<>(item.getSelectedHsnCodes()) : null);
         return dto;
     }
 }

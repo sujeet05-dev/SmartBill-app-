@@ -188,7 +188,13 @@ public class PdfGeneratorService {
                 totalQty += item.getQuantity();
 
                 // HSN column
-                String hsn = (item.getProduct().getHsnCode() != null) ? item.getProduct().getHsnCode() : "";
+                String hsn = "";
+                if (item.getSelectedHsnCodes() != null && !item.getSelectedHsnCodes().isEmpty()) {
+                    hsn = String.join(", ", item.getSelectedHsnCodes());
+                } else if (item.getProduct().getAvailableHsnCodes() != null && !item.getProduct().getAvailableHsnCodes().isEmpty()) {
+                    hsn = String.join(", ", item.getProduct().getAvailableHsnCodes());
+                }
+                
                 PdfPCell hsnCell = createCell(hsn, normalFont);
                 hsnCell.setBorder(Rectangle.BOX);
                 hsnCell.setHorizontalAlignment(Element.ALIGN_CENTER);

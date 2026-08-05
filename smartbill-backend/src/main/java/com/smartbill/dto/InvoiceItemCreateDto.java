@@ -14,6 +14,8 @@ public class InvoiceItemCreateDto {
     private Integer quantity;
 
     private List<String> selectedImeis;
+    
+    private List<String> selectedHsnCodes;
 
     public InvoiceItemCreateDto() {}
 
@@ -25,4 +27,7 @@ public class InvoiceItemCreateDto {
 
     public List<String> getSelectedImeis() { return selectedImeis; }
     public void setSelectedImeis(List<String> selectedImeis) { this.selectedImeis = selectedImeis; }
+
+    public List<String> getSelectedHsnCodes() { return selectedHsnCodes; }
+    public void setSelectedHsnCodes(List<String> selectedHsnCodes) { this.selectedHsnCodes = selectedHsnCodes; }
 }
