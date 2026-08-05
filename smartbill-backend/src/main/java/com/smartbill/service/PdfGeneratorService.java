@@ -145,12 +145,12 @@ public class PdfGeneratorService {
             // ========================
             // 5. Items Table
             // ========================
-            PdfPTable itemsTable = new PdfPTable(5);
+            PdfPTable itemsTable = new PdfPTable(6);
             itemsTable.setWidthPercentage(100);
-            itemsTable.setWidths(new float[]{3.5f, 1, 1.5f, 1.5f, 1.5f});
+            itemsTable.setWidths(new float[]{3f, 1f, 1f, 1.5f, 1.5f, 1.5f});
 
             // Header row
-            String[] headers = {"ITEMS", "QTY.", "RATE", "TAX", "AMOUNT"};
+            String[] headers = {"ITEMS", "QTY.", "HSN", "RATE", "TAX", "AMOUNT"};
             for (String h : headers) {
                 PdfPCell cell = new PdfPCell(new Phrase(h, headerFont));
                 cell.setBackgroundColor(new java.awt.Color(230, 230, 230));
@@ -187,6 +187,13 @@ public class PdfGeneratorService {
 
                 totalQty += item.getQuantity();
 
+                // HSN column
+                String hsn = (item.getProduct().getHsnCode() != null) ? item.getProduct().getHsnCode() : "";
+                PdfPCell hsnCell = createCell(hsn, normalFont);
+                hsnCell.setBorder(Rectangle.BOX);
+                hsnCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                itemsTable.addCell(hsnCell);
+
                 // RATE column (price before tax)
                 PdfPCell rateCell = createCell(formatAmount(item.getUnitPrice()), normalFont);
                 rateCell.setBorder(Rectangle.BOX);
@@ -214,9 +221,9 @@ public class PdfGeneratorService {
             // ========================
             // 6. SUBTOTAL Row
             // ========================
-            PdfPTable subTotalTable = new PdfPTable(5);
+            PdfPTable subTotalTable = new PdfPTable(6);
             subTotalTable.setWidthPercentage(100);
-            subTotalTable.setWidths(new float[]{3.5f, 1, 1.5f, 1.5f, 1.5f});
+            subTotalTable.setWidths(new float[]{3f, 1f, 1f, 1.5f, 1.5f, 1.5f});
 
             PdfPCell stLabel = createCell("SUBTOTAL", headerFont);
             stLabel.setBorder(Rectangle.BOX);
@@ -227,9 +234,13 @@ public class PdfGeneratorService {
             stQty.setHorizontalAlignment(Element.ALIGN_CENTER);
             subTotalTable.addCell(stQty);
 
-            PdfPCell stEmpty = createCell("", normalFont);
-            stEmpty.setBorder(Rectangle.BOX);
-            subTotalTable.addCell(stEmpty);
+            PdfPCell stEmpty1 = createCell("", normalFont);
+            stEmpty1.setBorder(Rectangle.BOX);
+            subTotalTable.addCell(stEmpty1);
+
+            PdfPCell stEmpty2 = createCell("", normalFont);
+            stEmpty2.setBorder(Rectangle.BOX);
+            subTotalTable.addCell(stEmpty2);
 
             PdfPCell stGst = createCell("\u20B9 " + formatAmount(invoice.getTotalGst()), boldFont);
             stGst.setBorder(Rectangle.BOX);

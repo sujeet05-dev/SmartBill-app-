@@ -14,6 +14,7 @@ const productSchema = z.object({
   brand: z.string().min(1, 'Brand is required'),
   category: z.string().min(1, 'Category is required'),
   sku: z.string().optional(),
+  hsnCode: z.string().optional(),
   imeisText: z.string().optional(),
   unit: z.string().optional(),
   price: z.preprocess((val) => Number(val), z.number().min(0, 'Price must be positive')),
@@ -64,6 +65,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
           gstPercentage: 18,
           stock: 0,
           sku: '',
+          hsnCode: '',
           imeisText: '',
           unit: 'PCS'
         });
@@ -92,6 +94,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
         brand: data.brand,
         category: data.category,
         sku: data.sku || '',
+        hsnCode: data.hsnCode || '',
         availableImeis: parsedImeis,
         unit: data.unit || 'PCS',
         price: data.price,
@@ -181,6 +184,12 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             label="SKU (Optional)"
             {...register('sku')}
             error={errors.sku?.message as string}
+          />
+          
+          <Input
+            label="HSN Code (Optional)"
+            {...register('hsnCode')}
+            error={errors.hsnCode?.message as string}
           />
 
           <div className="sm:col-span-2">

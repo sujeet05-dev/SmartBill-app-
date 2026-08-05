@@ -66,6 +66,7 @@ public class ProductService {
             existing.getAvailableImeis().clear();
         }
         existing.setUnit(productDto.getUnit() != null ? productDto.getUnit() : "PCS");
+        existing.setHsnCode(productDto.getHsnCode());
 
         Product saved = productRepository.save(existing);
         return productMapper.toDto(saved);

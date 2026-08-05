@@ -39,6 +39,8 @@ public class ProductDto {
 
     private String unit;
 
+    private String hsnCode;
+
     public ProductDto() {
         this.unit = "PCS";
     }
@@ -77,4 +79,7 @@ public class ProductDto {
 
     public String getUnit() { return unit; }
     public void setUnit(String unit) { this.unit = unit; }
+
+    public String getHsnCode() { return hsnCode; }
+    public void setHsnCode(String hsnCode) { this.hsnCode = hsnCode; }
 }

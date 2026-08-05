@@ -23,6 +23,7 @@ public class ProductMapper {
         dto.setSku(product.getSku());
         dto.setAvailableImeis(product.getAvailableImeis() != null ? new ArrayList<>(product.getAvailableImeis()) : null);
         dto.setUnit(product.getUnit());
+        dto.setHsnCode(product.getHsnCode());
         return dto;
     }
 
@@ -42,6 +43,7 @@ public class ProductMapper {
         product.setSku(dto.getSku());
         product.setAvailableImeis(dto.getAvailableImeis() != null ? new ArrayList<>(dto.getAvailableImeis()) : new ArrayList<>());
         product.setUnit(dto.getUnit() != null ? dto.getUnit() : "PCS");
+        product.setHsnCode(dto.getHsnCode());
         return product;
     }
 }
