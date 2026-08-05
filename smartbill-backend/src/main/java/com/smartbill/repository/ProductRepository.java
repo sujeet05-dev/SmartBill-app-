@@ -20,15 +20,4 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p WHERE p.user = :user AND (LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(p.brand) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :search, '%')))")
     List<Product> searchByUser(@Param("user") User user, @Param("search") String search);
 
-    @Modifying
-    @Query(value = "DELETE FROM invoice_item_imeis WHERE invoice_item_id IN (SELECT i.id FROM invoice_items i INNER JOIN invoices inv ON i.invoice_id = inv.id WHERE i.product_id = :productId AND inv.user_id = :userId)", nativeQuery = true)
-    void deleteInvoiceItemImeisByProductIdAndUser(@Param("productId") Long productId, @Param("userId") Long userId);
-
-    @Modifying
-    @Query(value = "DELETE FROM invoice_item_hsn_codes WHERE invoice_item_id IN (SELECT i.id FROM invoice_items i INNER JOIN invoices inv ON i.invoice_id = inv.id WHERE i.product_id = :productId AND inv.user_id = :userId)", nativeQuery = true)
-    void deleteInvoiceItemHsnCodesByProductIdAndUser(@Param("productId") Long productId, @Param("userId") Long userId);
-
-    @Modifying
-    @Query("DELETE FROM InvoiceItem i WHERE i.product.id = :productId AND i.invoice.user = :user")
-    void deleteInvoiceItemsByProductIdAndUser(@Param("productId") Long productId, @Param("user") User user);
 }

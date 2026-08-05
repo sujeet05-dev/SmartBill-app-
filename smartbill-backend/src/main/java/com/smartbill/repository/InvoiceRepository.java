@@ -20,4 +20,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
     @Query("SELECT i FROM Invoice i WHERE i.user = :user AND (LOWER(i.invoiceNumber) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(i.customerName) LIKE LOWER(CONCAT('%', :search, '%'))) ORDER BY i.date DESC")
     List<Invoice> searchByUser(@Param("user") User user, @Param("search") String search);
+
+    @Query("SELECT DISTINCT i FROM Invoice i JOIN i.items item WHERE item.product.id = :productId AND i.user = :user")
+    List<Invoice> findByProductIdAndUser(@Param("productId") Long productId, @Param("user") User user);
 }

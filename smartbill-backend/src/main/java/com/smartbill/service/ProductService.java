@@ -18,11 +18,13 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final SecurityUtils securityUtils;
+    private final com.smartbill.repository.InvoiceRepository invoiceRepository;
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, SecurityUtils securityUtils) {
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, SecurityUtils securityUtils, com.smartbill.repository.InvoiceRepository invoiceRepository) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.securityUtils = securityUtils;
+        this.invoiceRepository = invoiceRepository;
     }
 
     public List<ProductDto> getAllProducts(String search) {
@@ -84,11 +86,12 @@ public class ProductService {
         Product existing = productRepository.findByIdAndUser(id, currentUser)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        productRepository.deleteInvoiceItemImeisByProductIdAndUser(existing.getId(), currentUser.getId());
-        productRepository.deleteInvoiceItemHsnCodesByProductIdAndUser(existing.getId(), currentUser.getId());
-        productRepository.deleteInvoiceItemsByProductIdAndUser(existing.getId(), currentUser);
+        List<com.smartbill.entity.Invoice> invoices = invoiceRepository.findByProductIdAndUser(existing.getId(), currentUser);
+        for (com.smartbill.entity.Invoice invoice : invoices) {
+            invoice.getItems().removeIf(item -> item.getProduct() != null && item.getProduct().getId().equals(existing.getId()));
+        }
+        invoiceRepository.saveAll(invoices);
         
-        // Let JPA handle deleting the product and its @ElementCollections (product_imeis and product_hsn_codes)
         productRepository.delete(existing);
     }
 }
