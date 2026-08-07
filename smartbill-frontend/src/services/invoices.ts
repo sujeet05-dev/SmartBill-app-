@@ -5,7 +5,6 @@ export interface InvoiceItemCreate {
   productId: number;
   quantity: number;
   selectedImeis?: string[];
-  selectedHsnCodes?: string[];
 }
 
 export interface InvoiceCreate {
@@ -25,7 +24,6 @@ export interface InvoiceItemResponse {
   gstAmount: number;
   totalAmount: number;
   selectedImeis?: string[];
-  selectedHsnCodes?: string[];
 }
 
 export interface InvoiceResponse {

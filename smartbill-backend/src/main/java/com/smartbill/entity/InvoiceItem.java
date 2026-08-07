@@ -41,11 +41,6 @@ public class InvoiceItem {
     @Column(name = "imei")
     private List<String> selectedImeis = new ArrayList<>();
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "invoice_item_hsn_codes", joinColumns = @JoinColumn(name = "invoice_item_id"))
-    @Column(name = "hsn_code")
-    private List<String> selectedHsnCodes = new ArrayList<>();
-
     public InvoiceItem() {}
 
     // Getters and Setters
@@ -76,7 +71,4 @@ public class InvoiceItem {
 
     public List<String> getSelectedImeis() { return selectedImeis; }
     public void setSelectedImeis(List<String> selectedImeis) { this.selectedImeis = selectedImeis; }
-
-    public List<String> getSelectedHsnCodes() { return selectedHsnCodes; }
-    public void setSelectedHsnCodes(List<String> selectedHsnCodes) { this.selectedHsnCodes = selectedHsnCodes; }
 }

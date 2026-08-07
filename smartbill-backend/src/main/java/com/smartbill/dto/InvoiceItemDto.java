@@ -12,7 +12,6 @@ public class InvoiceItemDto {
     private BigDecimal gstAmount;
     private BigDecimal totalAmount;
     private List<String> selectedImeis;
-    private List<String> selectedHsnCodes;
 
     // Getters and Setters
     public Long getId() { return id; }
@@ -38,7 +37,4 @@ public class InvoiceItemDto {
     
     public List<String> getSelectedImeis() { return selectedImeis; }
     public void setSelectedImeis(List<String> selectedImeis) { this.selectedImeis = selectedImeis; }
-    
-    public List<String> getSelectedHsnCodes() { return selectedHsnCodes; }
-    public void setSelectedHsnCodes(List<String> selectedHsnCodes) { this.selectedHsnCodes = selectedHsnCodes; }
 }

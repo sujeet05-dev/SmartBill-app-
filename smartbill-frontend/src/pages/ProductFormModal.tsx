@@ -14,7 +14,7 @@ const productSchema = z.object({
   brand: z.string().min(1, 'Brand is required'),
   category: z.string().min(1, 'Category is required'),
   sku: z.string().optional(),
-  hsnCodesText: z.string().min(1, 'At least one HSN Code is required'),
+  hsnCode: z.string().min(1, 'HSN Code is required'),
   imeisText: z.string().optional(),
   unit: z.string().optional(),
   price: z.preprocess((val) => Number(val), z.number().min(0, 'Price must be positive')),
@@ -54,7 +54,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
         reset({
           ...product,
           imeisText: product.availableImeis ? product.availableImeis.join('\n') : '',
-          hsnCodesText: product.availableHsnCodes ? product.availableHsnCodes.join('\n') : ''
+          hsnCode: product.hsnCode || ''
         });
       } else {
         reset({
@@ -66,7 +66,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
           gstPercentage: 18,
           stock: 0,
           sku: '',
-          hsnCodesText: '',
+          hsnCode: '',
           imeisText: '',
           unit: 'PCS'
         });
@@ -82,10 +82,6 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
         ? data.imeisText.split(/[\n,]+/).map((i: string) => i.trim()).filter((i: string) => i.length > 0)
         : [];
         
-      const parsedHsnCodes = data.hsnCodesText 
-        ? data.hsnCodesText.split(/[\n,]+/).map((i: string) => i.trim()).filter((i: string) => i.length > 0)
-        : [];
-        
       if (parsedImeis.length > data.stock) {
         toast.error(`You entered ${parsedImeis.length} IMEIs, but stock is only ${data.stock}.`);
         setIsLoading(false);
@@ -99,7 +95,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
         brand: data.brand,
         category: data.category,
         sku: data.sku || '',
-        availableHsnCodes: parsedHsnCodes,
+        hsnCode: data.hsnCode || '',
         availableImeis: parsedImeis,
         unit: data.unit || 'PCS',
         price: data.price,
@@ -191,21 +187,11 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             error={errors.sku?.message as string}
           />
           
-          <div className="sm:col-span-2">
-            <label className="block text-sm font-medium leading-6 text-slate-900 mb-2">
-              HSN Codes
-            </label>
-            <p className="text-xs text-slate-500 mb-2">Enter multiple HSN codes separated by commas or new lines.</p>
-            <textarea
-              {...register('hsnCodesText')}
-              rows={2}
-              className="block w-full rounded-md border-0 py-1.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-              placeholder="1234, 5678&#10;..."
-            />
-            {errors.hsnCodesText?.message && (
-              <p className="mt-2 text-sm text-red-600">{errors.hsnCodesText.message as string}</p>
-            )}
-          </div>
+          <Input
+            label="HSN Code"
+            {...register('hsnCode')}
+            error={errors.hsnCode?.message as string}
+          />
 
           <div className="sm:col-span-2">
             <label className="block text-sm font-medium leading-6 text-slate-900 mb-2">

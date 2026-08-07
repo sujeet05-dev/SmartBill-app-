@@ -107,7 +107,7 @@ export const Inventory: React.FC = () => {
                   <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-slate-900 sm:pl-0">
                     <div>{product.name}</div>
                     {product.sku && <div className="text-xs text-slate-500">SKU: {product.sku}</div>}
-                    {product.availableHsnCodes && product.availableHsnCodes.length > 0 && <div className="text-xs text-slate-500">HSN Codes Recorded: {product.availableHsnCodes.length}</div>}
+                    {product.hsnCode && <div className="text-xs text-slate-500">HSN: {product.hsnCode}</div>}
                     {product.availableImeis && product.availableImeis.length > 0 && <div className="text-xs text-slate-500">IMEIs Recorded: {product.availableImeis.length}</div>}
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-500">{product.brand}</td>

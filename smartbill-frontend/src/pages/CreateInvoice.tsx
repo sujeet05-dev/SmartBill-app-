@@ -71,8 +71,7 @@ export const CreateInvoice: React.FC = () => {
       const items = data.items.map(item => ({
         productId: Number(item.productId),
         quantity: Number(item.quantity),
-        selectedImeis: item.selectedImeis || [],
-        selectedHsnCodes: item.selectedHsnCodes || []
+        selectedImeis: item.selectedImeis || []
       }));
 
       // Find any items that don't have enough stock
@@ -105,26 +104,6 @@ export const CreateInvoice: React.FC = () => {
 
       if (invalidImeis.length > 0) {
         toast.error('The number of selected IMEIs must match the quantity for the product.');
-        setIsLoading(false);
-        return;
-      }
-
-      const invalidHsnCodes = items.filter(item => {
-        const product = products.find(p => p.id === item.productId);
-        
-        if (product && product.availableHsnCodes && product.availableHsnCodes.length > 0) {
-          return !item.selectedHsnCodes || item.selectedHsnCodes.length !== item.quantity;
-        }
-        
-        if (item.selectedHsnCodes && item.selectedHsnCodes.length > 0) {
-          return item.selectedHsnCodes.length !== item.quantity;
-        }
-        
-        return false;
-      });
-
-      if (invalidHsnCodes.length > 0) {
-        toast.error('The number of selected HSN Codes must match the quantity for the product.');
         setIsLoading(false);
         return;
       }
@@ -252,24 +231,6 @@ export const CreateInvoice: React.FC = () => {
                             >
                               {selectedProduct.availableImeis.map(imei => (
                                 <option key={imei} value={imei}>{imei}</option>
-                              ))}
-                            </select>
-                            <p className="text-[10px] text-slate-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
-                          </div>
-                        )}
-                        {selectedProduct?.availableHsnCodes && selectedProduct.availableHsnCodes.length > 0 && (
-                          <div className="mt-2">
-                            <label className="block text-xs font-medium text-slate-700 mb-1">
-                              Select HSN Codes ({watchItems[index]?.selectedHsnCodes?.length || 0}/{qty})
-                            </label>
-                            <select
-                              multiple
-                              className="block w-full rounded-md border-0 py-1.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 sm:text-xs px-2 bg-white"
-                              {...register(`items.${index}.selectedHsnCodes` as const)}
-                              size={Math.min(3, selectedProduct.availableHsnCodes.length)}
-                            >
-                              {selectedProduct.availableHsnCodes.map((hsn, idx) => (
-                                <option key={`${hsn}-${idx}`} value={hsn}>{hsn}</option>
                               ))}
                             </select>
                             <p className="text-[10px] text-slate-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
