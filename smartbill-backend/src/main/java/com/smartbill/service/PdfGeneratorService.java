@@ -128,6 +128,9 @@ public class PdfGeneratorService {
             billToCell.addElement(new Paragraph("BILL TO", labelFont));
             String custName = (invoice.getCustomerName() != null && !invoice.getCustomerName().isEmpty()) ? invoice.getCustomerName() : "Cash Customer";
             billToCell.addElement(new Paragraph(custName, normalFont));
+            if (invoice.getCustomerAddress() != null && !invoice.getCustomerAddress().isEmpty()) {
+                billToCell.addElement(new Paragraph(invoice.getCustomerAddress(), smallFont));
+            }
             if (invoice.getPlaceOfSupply() != null && !invoice.getPlaceOfSupply().isEmpty()) {
                 billToCell.addElement(new Paragraph("Place of Supply: " + invoice.getPlaceOfSupply(), smallFont));
             }
@@ -137,6 +140,9 @@ public class PdfGeneratorService {
             shipToCell.setBorder(Rectangle.NO_BORDER);
             shipToCell.addElement(new Paragraph("SHIP TO", labelFont));
             shipToCell.addElement(new Paragraph(custName, normalFont));
+            if (invoice.getCustomerAddress() != null && !invoice.getCustomerAddress().isEmpty()) {
+                shipToCell.addElement(new Paragraph(invoice.getCustomerAddress(), smallFont));
+            }
             billShipTable.addCell(shipToCell);
 
             document.add(billShipTable);

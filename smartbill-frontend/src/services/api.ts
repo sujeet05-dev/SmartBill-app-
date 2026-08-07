@@ -30,7 +30,7 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     const isAuthRoute = originalRequest?.url?.includes('/auth/');
     
-    if (error.response?.status === 401 && !originalRequest._retry && !isAuthRoute) {
+    if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry && !isAuthRoute) {
       originalRequest._retry = true;
       localStorage.removeItem('token');
       localStorage.removeItem('user');

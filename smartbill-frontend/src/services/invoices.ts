@@ -10,6 +10,7 @@ export interface InvoiceItemCreate {
 export interface InvoiceCreate {
   customerName?: string;
   customerMobile?: string;
+  customerAddress?: string;
   paymentMethod: 'CASH' | 'CARD' | 'UPI';
   receivedAmount?: number;
   items: InvoiceItemCreate[];
@@ -34,6 +35,7 @@ export interface InvoiceResponse {
   placeOfSupply?: string;
   customerName: string;
   customerMobile: string;
+  customerAddress?: string;
   paymentMethod: string;
   subTotal: number;
   totalGst: number;

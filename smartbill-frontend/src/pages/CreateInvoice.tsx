@@ -142,6 +142,10 @@ export const CreateInvoice: React.FC = () => {
               label="Mobile Number (Optional)"
               {...register('customerMobile')}
             />
+            <Input
+              label="Customer Address (Optional)"
+              {...register('customerAddress')}
+            />
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Payment Method

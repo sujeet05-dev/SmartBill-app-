@@ -42,6 +42,7 @@ public class InvoiceService {
         invoice.setUser(currentUser);
         invoice.setCustomerName(createDto.getCustomerName());
         invoice.setCustomerMobile(createDto.getCustomerMobile());
+        invoice.setCustomerAddress(createDto.getCustomerAddress());
         invoice.setPaymentMethod(createDto.getPaymentMethod());
         
         LocalDateTime now = LocalDateTime.now();

@@ -13,6 +13,7 @@ public class InvoiceDto {
     private LocalDate dueDate;
     private String customerName;
     private String customerMobile;
+    private String customerAddress;
     private String placeOfSupply;
     private PaymentMethod paymentMethod;
     private BigDecimal subTotal;
@@ -42,6 +43,9 @@ public class InvoiceDto {
     
     public String getCustomerMobile() { return customerMobile; }
     public void setCustomerMobile(String customerMobile) { this.customerMobile = customerMobile; }
+
+    public String getCustomerAddress() { return customerAddress; }
+    public void setCustomerAddress(String customerAddress) { this.customerAddress = customerAddress; }
 
     public String getPlaceOfSupply() { return placeOfSupply; }
     public void setPlaceOfSupply(String placeOfSupply) { this.placeOfSupply = placeOfSupply; }

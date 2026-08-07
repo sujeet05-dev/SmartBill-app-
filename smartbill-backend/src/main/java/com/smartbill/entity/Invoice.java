@@ -31,6 +31,9 @@ public class Invoice {
     private String customerMobile;
 
     @Column
+    private String customerAddress;
+
+    @Column
     private String placeOfSupply;
 
     @Enumerated(EnumType.STRING)
@@ -86,6 +89,9 @@ public class Invoice {
 
     public String getCustomerMobile() { return customerMobile; }
     public void setCustomerMobile(String customerMobile) { this.customerMobile = customerMobile; }
+
+    public String getCustomerAddress() { return customerAddress; }
+    public void setCustomerAddress(String customerAddress) { this.customerAddress = customerAddress; }
 
     public String getPlaceOfSupply() { return placeOfSupply; }
     public void setPlaceOfSupply(String placeOfSupply) { this.placeOfSupply = placeOfSupply; }

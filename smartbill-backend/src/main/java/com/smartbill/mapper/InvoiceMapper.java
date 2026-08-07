@@ -26,6 +26,7 @@ public class InvoiceMapper {
         dto.setDueDate(invoice.getDueDate());
         dto.setCustomerName(invoice.getCustomerName());
         dto.setCustomerMobile(invoice.getCustomerMobile());
+        dto.setCustomerAddress(invoice.getCustomerAddress());
         dto.setPlaceOfSupply(invoice.getPlaceOfSupply());
         dto.setPaymentMethod(invoice.getPaymentMethod());
         dto.setSubTotal(invoice.getSubTotal());

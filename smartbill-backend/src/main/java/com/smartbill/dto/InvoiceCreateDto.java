@@ -11,6 +11,7 @@ public class InvoiceCreateDto {
 
     private String customerName;
     private String customerMobile;
+    private String customerAddress;
 
     @NotNull(message = "Payment method is required")
     private PaymentMethod paymentMethod;
@@ -28,6 +29,9 @@ public class InvoiceCreateDto {
 
     public String getCustomerMobile() { return customerMobile; }
     public void setCustomerMobile(String customerMobile) { this.customerMobile = customerMobile; }
+
+    public String getCustomerAddress() { return customerAddress; }
+    public void setCustomerAddress(String customerAddress) { this.customerAddress = customerAddress; }
 
     public PaymentMethod getPaymentMethod() { return paymentMethod; }
     public void setPaymentMethod(PaymentMethod paymentMethod) { this.paymentMethod = paymentMethod; }
