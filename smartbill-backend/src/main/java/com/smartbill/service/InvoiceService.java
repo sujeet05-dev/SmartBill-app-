@@ -131,7 +131,7 @@ public class InvoiceService {
 
         Invoice saved = invoiceRepository.save(invoice);
         
-        long invoiceNum = 500 + saved.getId();
+        long invoiceNum = 499 + saved.getId();
         saved.setInvoiceNumber(String.format("%06d", invoiceNum));
         saved = invoiceRepository.save(saved);
 
