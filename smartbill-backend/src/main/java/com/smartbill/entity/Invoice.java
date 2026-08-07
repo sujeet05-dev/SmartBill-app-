@@ -61,7 +61,7 @@ public class Invoice {
     @Column(columnDefinition = "TEXT")
     private String amountInWords;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "boolean default true")
     private Boolean isGst = true;
 
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
