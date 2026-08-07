@@ -56,7 +56,7 @@ public class InvoiceService {
         }
         
         String timestamp = now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        invoice.setInvoiceNumber("INV-" + timestamp);
+        invoice.setInvoiceNumber("TEMP-" + timestamp);
 
         // Set received amount
         invoice.setReceivedAmount(createDto.getReceivedAmount() != null ? createDto.getReceivedAmount() : BigDecimal.ZERO);
@@ -131,7 +131,8 @@ public class InvoiceService {
 
         Invoice saved = invoiceRepository.save(invoice);
         
-        saved.setInvoiceNumber("INV-" + String.format("%06d", saved.getId()));
+        long invoiceNum = 500 + saved.getId();
+        saved.setInvoiceNumber(String.format("%06d", invoiceNum));
         saved = invoiceRepository.save(saved);
 
         return invoiceMapper.toDto(saved);

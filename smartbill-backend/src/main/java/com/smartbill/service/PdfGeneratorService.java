@@ -91,9 +91,9 @@ public class PdfGeneratorService {
             // ========================
             // 3. Invoice Info Row
             // ========================
-            PdfPTable infoRow = new PdfPTable(3);
+            PdfPTable infoRow = new PdfPTable(2);
             infoRow.setWidthPercentage(100);
-            infoRow.setWidths(new float[]{1, 1.5f, 1});
+            infoRow.setWidths(new float[]{1, 1});
 
             DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -105,14 +105,8 @@ public class PdfGeneratorService {
             PdfPCell invDateCell = createCell("Invoice Date: " + invoice.getDate().format(dateFormat), boldFont);
             invDateCell.setBackgroundColor(new java.awt.Color(240, 240, 240));
             invDateCell.setBorder(Rectangle.BOX);
+            invDateCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
             infoRow.addCell(invDateCell);
-
-            String dueDateStr = invoice.getDueDate() != null ? invoice.getDueDate().format(dateFormat) : "N/A";
-            PdfPCell dueDateCell = createCell("Due Date: " + dueDateStr, boldFont);
-            dueDateCell.setBackgroundColor(new java.awt.Color(240, 240, 240));
-            dueDateCell.setBorder(Rectangle.BOX);
-            dueDateCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            infoRow.addCell(dueDateCell);
 
             document.add(infoRow);
             document.add(new Paragraph(" "));
