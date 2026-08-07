@@ -2,8 +2,10 @@ import api from './api';
 import { type Product } from './products';
 
 export interface InvoiceItemCreate {
-  productId: number;
+  productId?: number;
+  productName?: string;
   quantity: number;
+  unitPrice?: number;
   selectedImeis?: string[];
 }
 
@@ -11,14 +13,16 @@ export interface InvoiceCreate {
   customerName: string;
   customerMobile: string;
   customerAddress: string;
-  paymentMethod: 'CASH' | 'CARD' | 'UPI';
+  isGst?: boolean;
+  paymentMethod: 'CASH' | 'CARD' | 'UPI' | 'BANK_TRANSFER';
   receivedAmount?: number;
   items: InvoiceItemCreate[];
 }
 
 export interface InvoiceItemResponse {
   id: number;
-  product: Product;
+  product?: Product;
+  productName?: string;
   quantity: number;
   unitPrice: number;
   gstPercentage: number;
@@ -44,6 +48,7 @@ export interface InvoiceResponse {
   grandTotal: number;
   receivedAmount: number;
   amountInWords: string;
+  isGst: boolean;
   items: InvoiceItemResponse[];
 }
 
@@ -57,9 +62,11 @@ export interface MonthlySummaryResponse {
 }
 
 export const invoiceService = {
-  getAllInvoices: async (search?: string) => {
-    const params = search ? { search } : {};
-    const response = await api.get('/invoices', { params });
+  getAllInvoices: async (search?: string, isGst?: boolean) => {
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (isGst !== undefined) params.append('isGst', String(isGst));
+    const response = await api.get(`/invoices?${params.toString()}`);
     return response.data;
   },
 

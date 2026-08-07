@@ -66,43 +66,66 @@ public class InvoiceService {
 
         List<InvoiceItem> items = new ArrayList<>();
 
+        Boolean isGstBill = createDto.getIsGst() != null ? createDto.getIsGst() : true;
+        invoice.setIsGst(isGstBill);
+
         for (InvoiceItemCreateDto itemDto : createDto.getItems()) {
-            Product product = productRepository.findByIdAndUser(itemDto.getProductId(), currentUser)
-                    .orElseThrow(() -> new RuntimeException("Product not found: " + itemDto.getProductId()));
-
-            if (product.getStock() < itemDto.getQuantity()) {
-                throw new RuntimeException("Insufficient stock for product: " + product.getName() + ". Available: " + product.getStock());
-            }
-
-            // Validate and handle IMEIs
-            List<String> selectedImeis = itemDto.getSelectedImeis();
-            if (selectedImeis != null && !selectedImeis.isEmpty()) {
-                if (selectedImeis.size() != itemDto.getQuantity()) {
-                    throw new RuntimeException("Number of selected IMEIs must match the quantity for product: " + product.getName());
-                }
-                for (String imei : selectedImeis) {
-                    if (!product.getAvailableImeis().contains(imei)) {
-                        throw new RuntimeException("IMEI " + imei + " is not available for product: " + product.getName());
-                    }
-                }
-                product.getAvailableImeis().removeAll(selectedImeis);
-            }
-
-            // Reduce stock
-            product.setStock(product.getStock() - itemDto.getQuantity());
-            productRepository.save(product);
-
             InvoiceItem item = new InvoiceItem();
-            item.setProduct(product);
             item.setQuantity(itemDto.getQuantity());
-            item.setUnitPrice(product.getPrice());
-            item.setGstPercentage(product.getGstPercentage());
-            if (selectedImeis != null && !selectedImeis.isEmpty()) {
-                item.setSelectedImeis(new ArrayList<>(selectedImeis));
-            }
 
-            BigDecimal itemTotalExGst = product.getPrice().multiply(new BigDecimal(itemDto.getQuantity()));
-            BigDecimal itemGst = itemTotalExGst.multiply(new BigDecimal(product.getGstPercentage())).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
+            BigDecimal itemPrice;
+            Double itemGstPct = 0.0;
+            
+            if (itemDto.getProductId() != null && itemDto.getProductId() > 0) {
+                Product product = productRepository.findByIdAndUser(itemDto.getProductId(), currentUser)
+                        .orElseThrow(() -> new RuntimeException("Product not found: " + itemDto.getProductId()));
+    
+                if (product.getStock() < itemDto.getQuantity()) {
+                    throw new RuntimeException("Insufficient stock for product: " + product.getName() + ". Available: " + product.getStock());
+                }
+    
+                // Validate and handle IMEIs
+                List<String> selectedImeis = itemDto.getSelectedImeis();
+                if (selectedImeis != null && !selectedImeis.isEmpty()) {
+                    if (selectedImeis.size() != itemDto.getQuantity()) {
+                        throw new RuntimeException("Number of selected IMEIs must match the quantity for product: " + product.getName());
+                    }
+                    for (String imei : selectedImeis) {
+                        if (!product.getAvailableImeis().contains(imei)) {
+                            throw new RuntimeException("IMEI " + imei + " is not available for product: " + product.getName());
+                        }
+                    }
+                    product.getAvailableImeis().removeAll(selectedImeis);
+                }
+    
+                // Reduce stock
+                product.setStock(product.getStock() - itemDto.getQuantity());
+                productRepository.save(product);
+                
+                item.setProduct(product);
+                item.setProductName(product.getName());
+                itemPrice = product.getPrice();
+                itemGstPct = product.getGstPercentage();
+                
+                if (selectedImeis != null && !selectedImeis.isEmpty()) {
+                    item.setSelectedImeis(new ArrayList<>(selectedImeis));
+                }
+            } else {
+                item.setProductName(itemDto.getProductName());
+                itemPrice = itemDto.getUnitPrice();
+                itemGstPct = 0.0;
+            }
+            
+            item.setUnitPrice(itemPrice);
+            
+            // If it's a non-GST bill, force GST to 0 regardless of product settings
+            if (!isGstBill) {
+                itemGstPct = 0.0;
+            }
+            item.setGstPercentage(itemGstPct);
+
+            BigDecimal itemTotalExGst = itemPrice.multiply(new BigDecimal(itemDto.getQuantity()));
+            BigDecimal itemGst = itemTotalExGst.multiply(new BigDecimal(itemGstPct)).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
             BigDecimal itemTotalAmount = itemTotalExGst.add(itemGst);
 
             item.setGstAmount(itemGst);
@@ -131,21 +154,26 @@ public class InvoiceService {
 
         Invoice saved = invoiceRepository.save(invoice);
         
-        long invoiceNum = 499 + saved.getId();
-        saved.setInvoiceNumber(String.format("%06d", invoiceNum));
+        if (isGstBill) {
+            long invoiceNum = 499 + saved.getId();
+            saved.setInvoiceNumber(String.format("%06d", invoiceNum));
+        } else {
+            saved.setInvoiceNumber("EST-" + String.format("%04d", saved.getId()));
+        }
+        
         saved = invoiceRepository.save(saved);
 
         return invoiceMapper.toDto(saved);
     }
 
     @Transactional(readOnly = true)
-    public List<InvoiceDto> getAllInvoices(String search) {
+    public List<InvoiceDto> getAllInvoices(String search, Boolean isGst) {
         User currentUser = securityUtils.getCurrentUser();
         List<Invoice> invoices;
         if (search != null && !search.trim().isEmpty()) {
-            invoices = invoiceRepository.searchByUser(currentUser, search.trim());
+            invoices = invoiceRepository.searchByUserAndIsGst(currentUser, search.trim(), isGst);
         } else {
-            invoices = invoiceRepository.findByUserOrderByDateDesc(currentUser);
+            invoices = invoiceRepository.findByUserAndIsGstOrderByDateDesc(currentUser, isGst);
         }
         return invoices.stream()
                 .map(invoiceMapper::toDto)
@@ -184,7 +212,7 @@ public class InvoiceService {
     @Transactional(readOnly = true)
     public List<MonthlySummaryDto> getMonthlySummary() {
         User currentUser = securityUtils.getCurrentUser();
-        List<Invoice> invoices = invoiceRepository.findByUserOrderByDateDesc(currentUser);
+        List<Invoice> invoices = invoiceRepository.findByUserAndIsGstOrderByDateDesc(currentUser, true);
 
         Map<String, MonthlySummaryDto> summaryMap = new LinkedHashMap<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM yyyy");
@@ -209,9 +237,9 @@ public class InvoiceService {
     @Transactional(readOnly = true)
     public List<InvoiceDto> getInvoicesByMonth(int year, int month) {
         User currentUser = securityUtils.getCurrentUser();
-        List<Invoice> invoices = invoiceRepository.findByUserOrderByDateDesc(currentUser);
+        List<Invoice> allInvoices = invoiceRepository.findByUserAndIsGstOrderByDateDesc(currentUser, true);
 
-        return invoices.stream()
+        return allInvoices.stream()
                 .filter(i -> i.getDate().getYear() == year && i.getDate().getMonthValue() == month)
                 .map(invoiceMapper::toDto)
                 .collect(Collectors.toList());

@@ -14,12 +14,12 @@ import java.util.Optional;
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     Optional<Invoice> findByInvoiceNumber(String invoiceNumber);
     
-    List<Invoice> findByUserOrderByDateDesc(User user);
+    List<Invoice> findByUserAndIsGstOrderByDateDesc(User user, Boolean isGst);
 
     Optional<Invoice> findByIdAndUser(Long id, User user);
 
-    @Query("SELECT i FROM Invoice i WHERE i.user = :user AND (LOWER(i.invoiceNumber) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(i.customerName) LIKE LOWER(CONCAT('%', :search, '%'))) ORDER BY i.date DESC")
-    List<Invoice> searchByUser(@Param("user") User user, @Param("search") String search);
+    @Query("SELECT i FROM Invoice i WHERE i.user = :user AND i.isGst = :isGst AND (LOWER(i.invoiceNumber) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(i.customerName) LIKE LOWER(CONCAT('%', :search, '%'))) ORDER BY i.date DESC")
+    List<Invoice> searchByUserAndIsGst(@Param("user") User user, @Param("search") String search, @Param("isGst") Boolean isGst);
 
     @Query("SELECT DISTINCT i FROM Invoice i JOIN i.items item WHERE item.product.id = :productId AND i.user = :user")
     List<Invoice> findByProductIdAndUser(@Param("productId") Long productId, @Param("user") User user);

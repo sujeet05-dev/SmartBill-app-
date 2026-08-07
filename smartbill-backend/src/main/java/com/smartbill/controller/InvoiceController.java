@@ -31,8 +31,10 @@ public class InvoiceController {
     }
 
     @GetMapping
-    public ResponseEntity<List<InvoiceDto>> getAllInvoices(@RequestParam(required = false) String search) {
-        return ResponseEntity.ok(invoiceService.getAllInvoices(search));
+    public ResponseEntity<List<InvoiceDto>> getAllInvoices(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false, defaultValue = "true") Boolean isGst) {
+        return ResponseEntity.ok(invoiceService.getAllInvoices(search, isGst));
     }
 
     @GetMapping("/monthly-summary")

@@ -19,6 +19,8 @@ public class InvoiceCreateDto {
     @NotBlank(message = "Customer address is required")
     private String customerAddress;
 
+    private Boolean isGst = true;
+
     @NotNull(message = "Payment method is required")
     private PaymentMethod paymentMethod;
 
@@ -38,6 +40,9 @@ public class InvoiceCreateDto {
 
     public String getCustomerAddress() { return customerAddress; }
     public void setCustomerAddress(String customerAddress) { this.customerAddress = customerAddress; }
+
+    public Boolean getIsGst() { return isGst; }
+    public void setIsGst(Boolean isGst) { this.isGst = isGst; }
 
     public PaymentMethod getPaymentMethod() { return paymentMethod; }
     public void setPaymentMethod(PaymentMethod paymentMethod) { this.paymentMethod = paymentMethod; }

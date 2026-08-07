@@ -50,7 +50,8 @@ public class PdfGeneratorService {
             topBar.setWidthPercentage(100);
             topBar.setWidths(new float[]{1, 2});
 
-            PdfPCell taxLabel = new PdfPCell(new Phrase("TAX INVOICE", headerFont));
+            boolean isGst = Boolean.TRUE.equals(invoice.getIsGst());
+            PdfPCell taxLabel = new PdfPCell(new Phrase(isGst ? "TAX INVOICE" : "BILL OF SUPPLY / ESTIMATE", headerFont));
             taxLabel.setBorder(Rectangle.BOTTOM);
             taxLabel.setPadding(6);
             topBar.addCell(taxLabel);
@@ -80,7 +81,7 @@ public class PdfGeneratorService {
                     addr.append(", ").append(shop.getPincode());
                 }
                 document.add(new Paragraph(addr.toString(), normalFont));
-                document.add(new Paragraph("Mobile: " + shop.getPhone() + "      GSTIN: " + shop.getGstin(), boldFont));
+                document.add(new Paragraph("Mobile: " + shop.getPhone() + (isGst ? "      GSTIN: " + shop.getGstin() : ""), boldFont));
                 if (shop.getEmail() != null && !shop.getEmail().isEmpty()) {
                     document.add(new Paragraph("Email: " + shop.getEmail(), normalFont));
                 }
@@ -151,12 +152,16 @@ public class PdfGeneratorService {
             // ========================
             // 5. Items Table
             // ========================
-            PdfPTable itemsTable = new PdfPTable(6);
+            PdfPTable itemsTable = new PdfPTable(isGst ? 6 : 4);
             itemsTable.setWidthPercentage(100);
-            itemsTable.setWidths(new float[]{3f, 1f, 1f, 1.5f, 1.5f, 1.5f});
+            if (isGst) {
+                itemsTable.setWidths(new float[]{3f, 1f, 1f, 1.5f, 1.5f, 1.5f});
+            } else {
+                itemsTable.setWidths(new float[]{4f, 1f, 2f, 2f});
+            }
 
             // Header row
-            String[] headers = {"ITEMS", "QTY.", "HSN", "RATE", "TAX", "AMOUNT"};
+            String[] headers = isGst ? new String[]{"ITEMS", "QTY.", "HSN", "RATE", "TAX", "AMOUNT"} : new String[]{"ITEMS", "QTY.", "RATE", "AMOUNT"};
             for (String h : headers) {
                 PdfPCell cell = new PdfPCell(new Phrase(h, headerFont));
                 cell.setBackgroundColor(new java.awt.Color(230, 230, 230));
@@ -173,8 +178,8 @@ public class PdfGeneratorService {
                 nameCell.setPadding(5);
                 nameCell.setBorder(Rectangle.BOX);
                 
-                String productName = item.getProduct().getName();
-                if (item.getProduct().getDescription() != null && !item.getProduct().getDescription().isEmpty()) {
+                String productName = item.getProductName() != null ? item.getProductName() : (item.getProduct() != null ? item.getProduct().getName() : "");
+                if (item.getProduct() != null && item.getProduct().getDescription() != null && !item.getProduct().getDescription().isEmpty()) {
                     productName += " (" + item.getProduct().getDescription() + ")";
                 }
                 nameCell.addElement(new Paragraph(productName, boldFont));
@@ -185,7 +190,7 @@ public class PdfGeneratorService {
                 itemsTable.addCell(nameCell);
 
                 // QTY column
-                String unit = (item.getProduct().getUnit() != null && !item.getProduct().getUnit().isEmpty()) ? item.getProduct().getUnit() : "PCS";
+                String unit = (item.getProduct() != null && item.getProduct().getUnit() != null && !item.getProduct().getUnit().isEmpty()) ? item.getProduct().getUnit() : "PCS";
                 PdfPCell qtyCell = createCell(item.getQuantity() + " " + unit, normalFont);
                 qtyCell.setBorder(Rectangle.BOX);
                 qtyCell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -194,11 +199,13 @@ public class PdfGeneratorService {
                 totalQty += item.getQuantity();
 
                 // HSN column
-                String hsn = (item.getProduct().getHsnCode() != null) ? item.getProduct().getHsnCode() : "";
-                PdfPCell hsnCell = createCell(hsn, normalFont);
-                hsnCell.setBorder(Rectangle.BOX);
-                hsnCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                itemsTable.addCell(hsnCell);
+                if (isGst) {
+                    String hsn = (item.getProduct() != null && item.getProduct().getHsnCode() != null) ? item.getProduct().getHsnCode() : "";
+                    PdfPCell hsnCell = createCell(hsn, normalFont);
+                    hsnCell.setBorder(Rectangle.BOX);
+                    hsnCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    itemsTable.addCell(hsnCell);
+                }
 
                 // RATE column (price before tax)
                 PdfPCell rateCell = createCell(formatAmount(item.getUnitPrice()), normalFont);
@@ -207,13 +214,15 @@ public class PdfGeneratorService {
                 itemsTable.addCell(rateCell);
 
                 // TAX column
-                PdfPCell taxCell = new PdfPCell();
-                taxCell.setPadding(5);
-                taxCell.setBorder(Rectangle.BOX);
-                taxCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                taxCell.addElement(createRightParagraph(formatAmount(item.getGstAmount()), normalFont));
-                taxCell.addElement(createRightParagraph("(" + item.getGstPercentage().intValue() + "%)", smallFont));
-                itemsTable.addCell(taxCell);
+                if (isGst) {
+                    PdfPCell taxCell = new PdfPCell();
+                    taxCell.setPadding(5);
+                    taxCell.setBorder(Rectangle.BOX);
+                    taxCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                    taxCell.addElement(createRightParagraph(formatAmount(item.getGstAmount()), normalFont));
+                    taxCell.addElement(createRightParagraph("(" + item.getGstPercentage().intValue() + "%)", smallFont));
+                    itemsTable.addCell(taxCell);
+                }
 
                 // AMOUNT column
                 PdfPCell amountCell = createCell(formatAmount(item.getTotalAmount()), boldFont);
@@ -227,9 +236,13 @@ public class PdfGeneratorService {
             // ========================
             // 6. SUBTOTAL Row
             // ========================
-            PdfPTable subTotalTable = new PdfPTable(6);
+            PdfPTable subTotalTable = new PdfPTable(isGst ? 6 : 4);
             subTotalTable.setWidthPercentage(100);
-            subTotalTable.setWidths(new float[]{3f, 1f, 1f, 1.5f, 1.5f, 1.5f});
+            if (isGst) {
+                subTotalTable.setWidths(new float[]{3f, 1f, 1f, 1.5f, 1.5f, 1.5f});
+            } else {
+                subTotalTable.setWidths(new float[]{4f, 1f, 2f, 2f});
+            }
 
             PdfPCell stLabel = createCell("SUBTOTAL", headerFont);
             stLabel.setBorder(Rectangle.BOX);

@@ -36,6 +36,7 @@ public class InvoiceMapper {
         dto.setGrandTotal(invoice.getGrandTotal());
         dto.setReceivedAmount(invoice.getReceivedAmount());
         dto.setAmountInWords(invoice.getAmountInWords());
+        dto.setIsGst(invoice.getIsGst());
 
         if (invoice.getItems() != null) {
             dto.setItems(invoice.getItems().stream().map(this::toItemDto).collect(Collectors.toList()));
@@ -48,7 +49,10 @@ public class InvoiceMapper {
         if (item == null) return null;
         InvoiceItemDto dto = new InvoiceItemDto();
         dto.setId(item.getId());
-        dto.setProduct(productMapper.toDto(item.getProduct()));
+        if (item.getProduct() != null) {
+            dto.setProduct(productMapper.toDto(item.getProduct()));
+        }
+        dto.setProductName(item.getProductName());
         dto.setQuantity(item.getQuantity());
         dto.setUnitPrice(item.getUnitPrice());
         dto.setGstPercentage(item.getGstPercentage());

@@ -61,6 +61,9 @@ public class Invoice {
     @Column(columnDefinition = "TEXT")
     private String amountInWords;
 
+    @Column(nullable = false)
+    private Boolean isGst = true;
+
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InvoiceItem> items = new ArrayList<>();
 
@@ -119,6 +122,9 @@ public class Invoice {
 
     public String getAmountInWords() { return amountInWords; }
     public void setAmountInWords(String amountInWords) { this.amountInWords = amountInWords; }
+
+    public Boolean getIsGst() { return isGst; }
+    public void setIsGst(Boolean isGst) { this.isGst = isGst; }
 
     public List<InvoiceItem> getItems() { return items; }
     public void setItems(List<InvoiceItem> items) { 

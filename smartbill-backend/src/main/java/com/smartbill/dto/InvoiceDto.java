@@ -23,11 +23,15 @@ public class InvoiceDto {
     private BigDecimal grandTotal;
     private BigDecimal receivedAmount;
     private String amountInWords;
+    private Boolean isGst;
     private List<InvoiceItemDto> items;
 
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+    
+    public Boolean getIsGst() { return isGst; }
+    public void setIsGst(Boolean isGst) { this.isGst = isGst; }
     
     public String getInvoiceNumber() { return invoiceNumber; }
     public void setInvoiceNumber(String invoiceNumber) { this.invoiceNumber = invoiceNumber; }

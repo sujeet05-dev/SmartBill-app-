@@ -24,6 +24,7 @@ export const MainLayout: React.FC = () => {
     { name: 'Shop Details', href: '/shop', icon: Store },
     { name: 'Inventory', href: '/inventory', icon: Package },
     { name: 'Invoices', href: '/invoices', icon: FileText },
+    { name: 'Non-GST Bills', href: '/non-gst-invoices', icon: FileText },
     { name: 'Monthly Invoices', href: '/monthly-invoices', icon: Calendar },
   ];
 
