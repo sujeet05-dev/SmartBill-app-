@@ -2,6 +2,7 @@ package com.smartbill.dto;
 
 import com.smartbill.entity.PaymentMethod;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -9,8 +10,13 @@ import java.util.List;
 
 public class InvoiceCreateDto {
 
+    @NotBlank(message = "Customer name is required")
     private String customerName;
+
+    @NotBlank(message = "Customer mobile number is required")
     private String customerMobile;
+
+    @NotBlank(message = "Customer address is required")
     private String customerAddress;
 
     @NotNull(message = "Payment method is required")

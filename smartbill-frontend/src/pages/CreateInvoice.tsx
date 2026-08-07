@@ -13,7 +13,7 @@ export const CreateInvoice: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { register, control, handleSubmit, watch } = useForm<InvoiceCreate>({
+  const { register, control, handleSubmit, watch, formState: { errors } } = useForm<InvoiceCreate>({
     defaultValues: {
       paymentMethod: 'CASH',
       items: [{ productId: 0, quantity: 1 }]
@@ -135,16 +135,19 @@ export const CreateInvoice: React.FC = () => {
           <h3 className="text-lg font-medium text-slate-900 mb-4">Customer Details</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Input
-              label="Customer Name (Optional)"
-              {...register('customerName')}
+              label="Customer Name *"
+              {...register('customerName', { required: 'Customer name is required' })}
+              error={errors.customerName?.message as string}
             />
             <Input
-              label="Mobile Number (Optional)"
-              {...register('customerMobile')}
+              label="Mobile Number *"
+              {...register('customerMobile', { required: 'Mobile number is required' })}
+              error={errors.customerMobile?.message as string}
             />
             <Input
-              label="Customer Address (Optional)"
-              {...register('customerAddress')}
+              label="Customer Address *"
+              {...register('customerAddress', { required: 'Address is required' })}
+              error={errors.customerAddress?.message as string}
             />
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
