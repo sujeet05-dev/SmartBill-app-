@@ -21,10 +21,10 @@ export const NonGstInvoiceList: React.FC = () => {
     loadInvoices();
   }, [search]);
 
-  const loadInvoices = async () => {
+    const loadInvoices = async () => {
     try {
       setIsLoading(true);
-      const data = await invoiceService.getAllInvoices(search);
+      const data = await invoiceService.getAllInvoices(search, false);
       setInvoices(data);
     } catch (error) {
       console.error('Failed to load invoices', error);
