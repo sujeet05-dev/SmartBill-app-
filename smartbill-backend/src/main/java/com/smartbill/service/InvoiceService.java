@@ -104,7 +104,12 @@ public class InvoiceService {
                 
                 item.setProduct(product);
                 item.setProductName(product.getName());
-                itemPrice = product.getPrice();
+                
+                if (!isGstBill && itemDto.getUnitPrice() != null) {
+                    itemPrice = itemDto.getUnitPrice();
+                } else {
+                    itemPrice = product.getPrice();
+                }
                 itemGstPct = product.getGstPercentage();
                 
                 if (selectedImeis != null && !selectedImeis.isEmpty()) {
