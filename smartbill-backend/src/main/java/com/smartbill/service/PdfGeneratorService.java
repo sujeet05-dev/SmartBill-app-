@@ -261,10 +261,12 @@ public class PdfGeneratorService {
             stEmpty2.setBorder(Rectangle.BOX);
             subTotalTable.addCell(stEmpty2);
 
-            PdfPCell stGst = createCell("\u20B9 " + formatAmount(invoice.getTotalGst()), boldFont);
-            stGst.setBorder(Rectangle.BOX);
-            stGst.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            subTotalTable.addCell(stGst);
+            if (isGst) {
+                PdfPCell stGst = createCell("\u20B9 " + formatAmount(invoice.getTotalGst()), boldFont);
+                stGst.setBorder(Rectangle.BOX);
+                stGst.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                subTotalTable.addCell(stGst);
+            }
 
             PdfPCell stTotal = createCell("\u20B9 " + formatAmount(invoice.getGrandTotal()), bigBoldFont);
             stTotal.setBorder(Rectangle.BOX);
@@ -307,9 +309,11 @@ public class PdfGeneratorService {
             PdfPTable taxTable = new PdfPTable(2);
             taxTable.setWidthPercentage(100);
 
-            addTaxRow(taxTable, "Taxable Amount", "\u20B9 " + formatAmount(invoice.getSubTotal()), boldFont, normalFont);
-            addTaxRow(taxTable, "CGST @" + (int)halfRate + "%", "\u20B9 " + formatAmount(invoice.getCgstAmount()), normalFont, normalFont);
-            addTaxRow(taxTable, "SGST @" + (int)halfRate + "%", "\u20B9 " + formatAmount(invoice.getSgstAmount()), normalFont, normalFont);
+            if (isGst) {
+                addTaxRow(taxTable, "Taxable Amount", "\u20B9 " + formatAmount(invoice.getSubTotal()), boldFont, normalFont);
+                addTaxRow(taxTable, "CGST @" + (int)halfRate + "%", "\u20B9 " + formatAmount(invoice.getCgstAmount()), normalFont, normalFont);
+                addTaxRow(taxTable, "SGST @" + (int)halfRate + "%", "\u20B9 " + formatAmount(invoice.getSgstAmount()), normalFont, normalFont);
+            }
             addTaxRow(taxTable, "Total Amount", "\u20B9 " + formatAmount(invoice.getGrandTotal()), bigBoldFont, bigBoldFont);
             addTaxRow(taxTable, "Received Amount", "\u20B9 " + formatAmount(invoice.getReceivedAmount() != null ? invoice.getReceivedAmount() : BigDecimal.ZERO), normalFont, normalFont);
 
