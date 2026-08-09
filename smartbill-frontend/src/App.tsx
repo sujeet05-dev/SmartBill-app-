@@ -13,13 +13,7 @@ import { CreateInvoice } from '@/pages/CreateInvoice';
 import { CreateNonGstInvoice } from '@/pages/CreateNonGstInvoice';
 import { Toaster } from 'react-hot-toast';
 
-// Placeholder for the Dashboard content
-const Dashboard = () => (
-  <div className="bg-white rounded-lg shadow p-6">
-    <h2 className="text-2xl font-bold mb-4">Dashboard Overview</h2>
-    <p className="text-slate-600">Welcome to SmartBill Admin Dashboard. Navigate using the sidebar.</p>
-  </div>
-);
+import { Dashboard } from '@/pages/Dashboard';
 
 function App() {
   return (
