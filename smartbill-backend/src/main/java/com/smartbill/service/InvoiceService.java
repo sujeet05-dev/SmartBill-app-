@@ -158,14 +158,32 @@ public class InvoiceService {
         invoice.setItems(items);
 
         Invoice saved = invoiceRepository.save(invoice);
+        Invoice lastInvoice = invoiceRepository.findFirstByUserAndIsGstAndIdNotOrderByIdDesc(currentUser, isGstBill, saved.getId());
         
         if (isGstBill) {
-            long invoiceNum = 499 + saved.getId();
+            long invoiceNum = 500;
+            if (lastInvoice != null && lastInvoice.getInvoiceNumber() != null) {
+                try {
+                    invoiceNum = Long.parseLong(lastInvoice.getInvoiceNumber()) + 1;
+                } catch (NumberFormatException e) {
+                    // fallback
+                    invoiceNum = 500 + saved.getId();
+                }
+            }
             saved.setInvoiceNumber(String.format("%06d", invoiceNum));
         } else {
-            saved.setInvoiceNumber("EST-" + String.format("%04d", saved.getId()));
+            long invoiceNum = 1;
+            if (lastInvoice != null && lastInvoice.getInvoiceNumber() != null) {
+                try {
+                    String numStr = lastInvoice.getInvoiceNumber().replace("EST-", "");
+                    invoiceNum = Long.parseLong(numStr) + 1;
+                } catch (NumberFormatException e) {
+                    // fallback
+                    invoiceNum = saved.getId();
+                }
+            }
+            saved.setInvoiceNumber("EST-" + String.format("%04d", invoiceNum));
         }
-        
         saved = invoiceRepository.save(saved);
 
         return invoiceMapper.toDto(saved);
