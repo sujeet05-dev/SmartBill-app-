@@ -199,17 +199,7 @@ public class InvoiceService {
         Invoice invoice = invoiceRepository.findByIdAndUser(id, currentUser)
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
         
-        // Restore product stock
-        for (InvoiceItem item : invoice.getItems()) {
-            Product product = item.getProduct();
-            if (product != null) {
-                product.setStock(product.getStock() + item.getQuantity());
-                if (item.getSelectedImeis() != null && !item.getSelectedImeis().isEmpty()) {
-                    product.getAvailableImeis().addAll(item.getSelectedImeis());
-                }
-                productRepository.save(product);
-            }
-        }
+        // Do not restore product stock as per user request
         
         invoiceRepository.delete(invoice);
     }
