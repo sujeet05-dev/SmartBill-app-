@@ -74,7 +74,7 @@ public class InvoiceService {
             item.setQuantity(itemDto.getQuantity());
 
             BigDecimal itemPrice;
-            Double itemGstPct = 0.0;
+            double itemGstPct;
             
             if (itemDto.getProductId() != null && itemDto.getProductId() > 0) {
                 Product product = productRepository.findByIdAndUser(itemDto.getProductId(), currentUser)
@@ -160,9 +160,9 @@ public class InvoiceService {
         Invoice saved = invoiceRepository.save(invoice);
         Invoice lastInvoice;
         if (isGstBill) {
-            lastInvoice = invoiceRepository.findFirstByUserAndInvoiceNumberNotLikeAndIdNotOrderByIdDesc(currentUser, "EST-%", saved.getId());
+            lastInvoice = invoiceRepository.findLastGstInvoice(currentUser.getId(), saved.getId());
         } else {
-            lastInvoice = invoiceRepository.findFirstByUserAndInvoiceNumberStartingWithAndIdNotOrderByIdDesc(currentUser, "EST-", saved.getId());
+            lastInvoice = invoiceRepository.findLastNonGstInvoice(currentUser.getId(), saved.getId());
         }
         if (isGstBill) {
             long invoiceNum = 500;
