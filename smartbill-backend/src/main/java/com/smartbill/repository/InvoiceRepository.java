@@ -17,6 +17,10 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     List<Invoice> findByUserAndIsGstOrderByDateDesc(User user, Boolean isGst);
     
     Invoice findFirstByUserAndIsGstAndIdNotOrderByIdDesc(User user, Boolean isGst, Long id);
+    
+    Invoice findFirstByUserAndInvoiceNumberStartingWithAndIdNotOrderByIdDesc(User user, String prefix, Long id);
+    
+    Invoice findFirstByUserAndInvoiceNumberNotLikeAndIdNotOrderByIdDesc(User user, String pattern, Long id);
 
     Optional<Invoice> findByIdAndUser(Long id, User user);
 

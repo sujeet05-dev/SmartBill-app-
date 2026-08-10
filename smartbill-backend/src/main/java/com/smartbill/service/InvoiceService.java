@@ -158,8 +158,12 @@ public class InvoiceService {
         invoice.setItems(items);
 
         Invoice saved = invoiceRepository.save(invoice);
-        Invoice lastInvoice = invoiceRepository.findFirstByUserAndIsGstAndIdNotOrderByIdDesc(currentUser, isGstBill, saved.getId());
-        
+        Invoice lastInvoice;
+        if (isGstBill) {
+            lastInvoice = invoiceRepository.findFirstByUserAndInvoiceNumberNotLikeAndIdNotOrderByIdDesc(currentUser, "EST-%", saved.getId());
+        } else {
+            lastInvoice = invoiceRepository.findFirstByUserAndInvoiceNumberStartingWithAndIdNotOrderByIdDesc(currentUser, "EST-", saved.getId());
+        }
         if (isGstBill) {
             long invoiceNum = 500;
             if (lastInvoice != null && lastInvoice.getInvoiceNumber() != null) {
