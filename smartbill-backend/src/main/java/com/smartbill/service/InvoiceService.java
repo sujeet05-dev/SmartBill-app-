@@ -116,8 +116,23 @@ public class InvoiceService {
                     item.setSelectedImeis(new ArrayList<>(selectedImeis));
                 }
             } else {
+                Product dummyProduct = productRepository.findBySkuAndUser("MANUAL_ENTRY_DUMMY", currentUser).orElse(null);
+                if (dummyProduct == null) {
+                    dummyProduct = new Product();
+                    dummyProduct.setName("Manual Entry Item");
+                    dummyProduct.setBrand("-");
+                    dummyProduct.setCategory("-");
+                    dummyProduct.setPrice(BigDecimal.ZERO);
+                    dummyProduct.setGstPercentage(0.0);
+                    dummyProduct.setStock(999999);
+                    dummyProduct.setSku("MANUAL_ENTRY_DUMMY");
+                    dummyProduct.setUser(currentUser);
+                    dummyProduct = productRepository.save(dummyProduct);
+                }
+                
+                item.setProduct(dummyProduct);
                 item.setProductName(itemDto.getProductName());
-                itemPrice = itemDto.getUnitPrice();
+                itemPrice = itemDto.getUnitPrice() != null ? itemDto.getUnitPrice() : BigDecimal.ZERO;
                 itemGstPct = 0.0;
             }
             
