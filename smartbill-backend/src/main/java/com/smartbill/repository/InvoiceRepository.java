@@ -16,11 +16,11 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     
     List<Invoice> findByUserAndIsGstOrderByDateDesc(User user, Boolean isGst);
     
-    @Query(value = "SELECT * FROM invoices WHERE user_id = :userId AND invoice_number NOT LIKE 'EST-%' AND id != :id ORDER BY id DESC LIMIT 1", nativeQuery = true)
-    Invoice findLastGstInvoice(@Param("userId") Long userId, @Param("id") Long id);
+    @Query("SELECT i.invoiceNumber FROM Invoice i WHERE i.user = :user AND i.invoiceNumber NOT LIKE 'EST-%'")
+    List<String> findAllGstInvoiceNumbersByUser(@Param("user") User user);
     
-    @Query(value = "SELECT * FROM invoices WHERE user_id = :userId AND invoice_number LIKE 'EST-%' AND id != :id ORDER BY id DESC LIMIT 1", nativeQuery = true)
-    Invoice findLastNonGstInvoice(@Param("userId") Long userId, @Param("id") Long id);
+    @Query("SELECT i.invoiceNumber FROM Invoice i WHERE i.user = :user AND i.invoiceNumber LIKE 'EST-%'")
+    List<String> findAllNonGstInvoiceNumbersByUser(@Param("user") User user);
 
     Optional<Invoice> findByIdAndUser(Long id, User user);
 

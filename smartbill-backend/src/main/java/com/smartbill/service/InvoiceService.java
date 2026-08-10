@@ -172,37 +172,44 @@ public class InvoiceService {
 
         invoice.setItems(items);
 
+        // Assign a temporary unique invoice number to satisfy NOT NULL constraints before final sequence is determined
+        String tempId = "TEMP-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 5);
+        invoice.setInvoiceNumber(tempId);
+
         Invoice saved = invoiceRepository.save(invoice);
-        Invoice lastInvoice;
+        
+        long invoiceNum;
         if (isGstBill) {
-            lastInvoice = invoiceRepository.findLastGstInvoice(currentUser.getId(), saved.getId());
-        } else {
-            lastInvoice = invoiceRepository.findLastNonGstInvoice(currentUser.getId(), saved.getId());
-        }
-        if (isGstBill) {
-            long invoiceNum = 500;
-            if (lastInvoice != null && lastInvoice.getInvoiceNumber() != null) {
+            List<String> numbers = invoiceRepository.findAllGstInvoiceNumbersByUser(currentUser);
+            long max = 499;
+            for (String n : numbers) {
+                if (n == null || n.startsWith("TEMP-")) continue;
                 try {
-                    invoiceNum = Long.parseLong(lastInvoice.getInvoiceNumber()) + 1;
+                    long val = Long.parseLong(n);
+                    if (val > max) max = val;
                 } catch (NumberFormatException e) {
-                    // fallback
-                    invoiceNum = 500 + saved.getId();
+                    // skip invalid formats
                 }
             }
+            invoiceNum = max + 1;
             saved.setInvoiceNumber(String.format("%06d", invoiceNum));
         } else {
-            long invoiceNum = 1;
-            if (lastInvoice != null && lastInvoice.getInvoiceNumber() != null) {
+            List<String> numbers = invoiceRepository.findAllNonGstInvoiceNumbersByUser(currentUser);
+            long max = 0;
+            for (String n : numbers) {
+                if (n == null || n.startsWith("TEMP-")) continue;
                 try {
-                    String numStr = lastInvoice.getInvoiceNumber().replace("EST-", "");
-                    invoiceNum = Long.parseLong(numStr) + 1;
+                    String numStr = n.replace("EST-", "");
+                    long val = Long.parseLong(numStr);
+                    if (val > max) max = val;
                 } catch (NumberFormatException e) {
-                    // fallback
-                    invoiceNum = saved.getId();
+                    // skip invalid formats
                 }
             }
+            invoiceNum = max + 1;
             saved.setInvoiceNumber("EST-" + String.format("%04d", invoiceNum));
         }
+        
         saved = invoiceRepository.save(saved);
 
         return invoiceMapper.toDto(saved);
