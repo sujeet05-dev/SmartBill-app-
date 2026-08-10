@@ -63,13 +63,16 @@ export const CreateNonGstInvoice: React.FC = () => {
     try {
       setIsLoading(true);
 
-      const items = data.items.map(item => ({
-        productId: item.productId ? Number(item.productId) : undefined,
-        productName: item.productName || undefined,
-        unitPrice: Number(item.unitPrice),
-        quantity: Number(item.quantity),
-        selectedImeis: item.selectedImeis || []
-      }));
+      const items = data.items.map(item => {
+        const prodId = Number(item.productId);
+        return {
+          productId: prodId > 0 ? prodId : undefined,
+          productName: item.productName || undefined,
+          unitPrice: Number(item.unitPrice),
+          quantity: Number(item.quantity),
+          selectedImeis: item.selectedImeis || []
+        };
+      });
 
       // Find any items that don't have enough stock (only for inventory products)
       const invalidItems = items.filter(item => {
