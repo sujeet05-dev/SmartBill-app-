@@ -245,6 +245,20 @@ public class InvoiceService {
         
         // Do not restore product stock as per user request
         
+        // Explicitly clear nested element collections to prevent Hibernate ConstraintViolationException
+        // when the database lacks ON DELETE CASCADE for element collections.
+        if (invoice.getItems() != null) {
+            for (InvoiceItem item : invoice.getItems()) {
+                if (item.getSelectedImeis() != null) {
+                    item.getSelectedImeis().clear();
+                }
+            }
+            invoice.getItems().clear();
+        }
+        
+        // Flush the changes to ensure child records (and element collections) are deleted before the parent invoice
+        invoiceRepository.saveAndFlush(invoice);
+        
         invoiceRepository.delete(invoice);
     }
 
