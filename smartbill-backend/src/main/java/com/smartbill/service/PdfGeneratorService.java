@@ -13,6 +13,10 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.format.DateTimeFormatter;
+import java.time.Month;
+import java.time.format.TextStyle;
+import java.util.List;
+import java.util.Locale;
 
 @Service
 public class PdfGeneratorService {
@@ -390,5 +394,102 @@ public class PdfGeneratorService {
     private String formatAmount(BigDecimal amount) {
         if (amount == null) return "0.00";
         return String.format("%,.2f", amount);
+    }
+
+    public byte[] generateMonthlyReportPdf(int year, int month, List<InvoiceDto> invoices) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Document document = new Document(PageSize.A4, 36, 36, 36, 36);
+
+        try {
+            PdfWriter.getInstance(document, out);
+            document.open();
+
+            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18);
+            Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
+            Font normalFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
+            Font boldFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10);
+
+            ShopDto shop = shopService.getShop();
+            String shopName = shop != null ? shop.getName() : "SmartBill";
+
+            // Title
+            Paragraph title = new Paragraph(shopName + " - Monthly Invoice Report", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
+            
+            String monthName = Month.of(month).getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+            Paragraph period = new Paragraph(monthName + " " + year, headerFont);
+            period.setAlignment(Element.ALIGN_CENTER);
+            document.add(period);
+            
+            document.add(new Paragraph(" "));
+
+            // Summary
+            int totalInvoices = invoices.size();
+            BigDecimal totalSales = invoices.stream()
+                    .map(InvoiceDto::getGrandTotal)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            document.add(new Paragraph("Total Invoices: " + totalInvoices, normalFont));
+            document.add(new Paragraph("Total Sales: \u20B9" + formatAmount(totalSales), boldFont));
+            
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph("Invoice Details", headerFont));
+            document.add(new Paragraph(" "));
+
+            // Table
+            PdfPTable table = new PdfPTable(3);
+            table.setWidthPercentage(100);
+            table.setWidths(new float[]{1.5f, 1.5f, 1.5f});
+
+            // Table Headers
+            String[] headers = {"Invoice Number", "Date", "Amount"};
+            for (String h : headers) {
+                PdfPCell cell = new PdfPCell(new Phrase(h, boldFont));
+                cell.setBackgroundColor(new java.awt.Color(230, 230, 230));
+                cell.setPadding(6);
+                table.addCell(cell);
+            }
+
+            DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+            // Rows
+            for (InvoiceDto inv : invoices) {
+                PdfPCell cellNo = new PdfPCell(new Phrase(inv.getInvoiceNumber(), normalFont));
+                cellNo.setPadding(5);
+                table.addCell(cellNo);
+
+                PdfPCell cellDate = new PdfPCell(new Phrase(inv.getDate().format(dateFormat), normalFont));
+                cellDate.setPadding(5);
+                table.addCell(cellDate);
+
+                PdfPCell cellAmt = new PdfPCell(new Phrase("\u20B9" + formatAmount(inv.getGrandTotal()), normalFont));
+                cellAmt.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                cellAmt.setPadding(5);
+                table.addCell(cellAmt);
+            }
+
+            // Footer / Total Row
+            PdfPCell totalLabel = new PdfPCell(new Phrase("Total Sales:", boldFont));
+            totalLabel.setColspan(2);
+            totalLabel.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            totalLabel.setPadding(6);
+            totalLabel.setBackgroundColor(new java.awt.Color(240, 240, 240));
+            table.addCell(totalLabel);
+
+            PdfPCell totalVal = new PdfPCell(new Phrase("\u20B9" + formatAmount(totalSales), boldFont));
+            totalVal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            totalVal.setPadding(6);
+            totalVal.setBackgroundColor(new java.awt.Color(240, 240, 240));
+            table.addCell(totalVal);
+
+            document.add(table);
+            document.close();
+
+        } catch (DocumentException e) {
+            throw new RuntimeException("Failed to generate monthly report PDF", e);
+        }
+
+        return out.toByteArray();
     }
 }

@@ -107,6 +107,30 @@ export const MonthlyInvoices: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  const handleDownloadMonthlyReport = async () => {
+    if (!selectedMonth) return;
+    if (monthInvoices.length === 0) {
+      toast.error('No invoices to download for this month.');
+      return;
+    }
+    
+    try {
+      const blob = await invoiceService.downloadMonthlyReportPdf(selectedMonth.year, selectedMonth.month);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const monthStr = String(selectedMonth.month).padStart(2, '0');
+      link.setAttribute('download', `monthly_report_${selectedMonth.year}_${monthStr}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to download monthly report', error);
+      toast.error('Failed to download monthly report.');
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -226,13 +250,28 @@ export const MonthlyInvoices: React.FC = () => {
 
           {/* Detailed Invoices Table for Selected Month */}
           <div className="bg-white shadow rounded-lg p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-bold text-slate-900">
-                Invoices Created in {selectedMonth?.monthYear}
-              </h3>
-              <span className="text-xs font-semibold px-3 py-1 bg-blue-100 text-blue-800 rounded-full">
-                {monthInvoices.length} Invoices Found
-              </span>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+              <div className="flex items-center gap-3">
+                <h3 className="text-lg font-bold text-slate-900">
+                  Invoices Created in {selectedMonth?.monthYear}
+                </h3>
+                <span className="text-xs font-semibold px-3 py-1 bg-blue-100 text-blue-800 rounded-full">
+                  {monthInvoices.length} Invoices Found
+                </span>
+              </div>
+              
+              <button
+                onClick={handleDownloadMonthlyReport}
+                disabled={monthInvoices.length === 0}
+                className={`flex items-center px-4 py-2 rounded-md text-sm font-medium text-white transition-colors ${
+                  monthInvoices.length === 0
+                    ? 'bg-slate-400 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700'
+                }`}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download Report
+              </button>
             </div>
 
             <div className="overflow-x-auto">

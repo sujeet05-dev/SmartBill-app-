@@ -68,6 +68,21 @@ public class InvoiceController {
                 .body(pdfBytes);
     }
 
+    @GetMapping(value = "/monthly-report/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> getMonthlyReportPdf(@RequestParam int year, @RequestParam int month) {
+        List<InvoiceDto> invoices = invoiceService.getInvoicesByMonth(year, month);
+        
+        // If there are no invoices, we can still generate an empty report or handle it.
+        // The frontend will usually block this call if there are 0 invoices, 
+        // but it's safe to generate one with total 0 anyway.
+        byte[] pdfBytes = pdfGeneratorService.generateMonthlyReportPdf(year, month, invoices);
+        
+        String monthStr = String.format("%02d", month);
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=\"monthly_report_" + year + "_" + monthStr + ".pdf\"")
+                .body(pdfBytes);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteInvoice(@PathVariable Long id) {
         invoiceService.deleteInvoice(id);

@@ -107,6 +107,14 @@ export const invoiceService = {
     return response.data;
   },
 
+  downloadMonthlyReportPdf: async (year: number, month: number) => {
+    const response = await api.get('/invoices/monthly-report/pdf', {
+      params: { year, month },
+      responseType: 'blob',
+    });
+    return response.data;
+  },
+
   deleteInvoice: async (id: number) => {
     const response = await api.delete(`/invoices/${id}`);
     return response.data;
