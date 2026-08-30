@@ -11,26 +11,9 @@ export const Dashboard: React.FC = () => {
     const fetchStats = async () => {
       try {
         setIsLoading(true);
-        // Fetch both GST and Non-GST invoices
-        const [gstInvoices, nonGstInvoices] = await Promise.all([
-          invoiceService.getAllInvoices('', true),
-          invoiceService.getAllInvoices('', false)
-        ]);
-
-        const allInvoices = [...gstInvoices, ...nonGstInvoices];
-
-        let revenue = 0;
-        let itemsCount = 0;
-
-        allInvoices.forEach(invoice => {
-          revenue += invoice.grandTotal;
-          invoice.items.forEach((item: any) => {
-            itemsCount += item.quantity;
-          });
-        });
-
-        setTotalRevenue(revenue);
-        setTotalItemsSold(itemsCount);
+        const stats = await invoiceService.getDashboardStats();
+        setTotalRevenue(stats.totalRevenue);
+        setTotalItemsSold(stats.totalItemsSold);
       } catch (error) {
         console.error('Failed to fetch dashboard stats', error);
       } finally {

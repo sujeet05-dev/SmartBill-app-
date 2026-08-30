@@ -61,12 +61,22 @@ export interface MonthlySummaryResponse {
   totalGst: number;
 }
 
+export interface DashboardStatsResponse {
+  totalRevenue: number;
+  totalItemsSold: number;
+}
+
 export const invoiceService = {
   getAllInvoices: async (search?: string, isGst?: boolean) => {
     const params = new URLSearchParams();
     if (search) params.append('search', search);
     if (isGst !== undefined) params.append('isGst', String(isGst));
     const response = await api.get(`/invoices?${params.toString()}`);
+    return response.data;
+  },
+
+  getDashboardStats: async (): Promise<DashboardStatsResponse> => {
+    const response = await api.get('/invoices/dashboard-stats');
     return response.data;
   },
 

@@ -283,4 +283,12 @@ public class InvoiceService {
                 .map(invoiceMapper::toDto)
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public DashboardStatsDto getDashboardStats() {
+        User currentUser = securityUtils.getCurrentUser();
+        BigDecimal totalRevenue = invoiceRepository.getTotalRevenueByUser(currentUser);
+        Long totalItemsSold = invoiceRepository.getTotalItemsSoldByUser(currentUser);
+        return new DashboardStatsDto(totalRevenue, totalItemsSold);
+    }
 }

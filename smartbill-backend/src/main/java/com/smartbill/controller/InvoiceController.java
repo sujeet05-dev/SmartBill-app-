@@ -3,6 +3,7 @@ package com.smartbill.controller;
 import com.smartbill.dto.InvoiceCreateDto;
 import com.smartbill.dto.InvoiceDto;
 import com.smartbill.dto.MonthlySummaryDto;
+import com.smartbill.dto.DashboardStatsDto;
 import com.smartbill.service.InvoiceService;
 import com.smartbill.service.PdfGeneratorService;
 import jakarta.validation.Valid;
@@ -40,6 +41,11 @@ public class InvoiceController {
     @GetMapping("/monthly-summary")
     public ResponseEntity<List<MonthlySummaryDto>> getMonthlySummary() {
         return ResponseEntity.ok(invoiceService.getMonthlySummary());
+    }
+
+    @GetMapping("/dashboard-stats")
+    public ResponseEntity<DashboardStatsDto> getDashboardStats() {
+        return ResponseEntity.ok(invoiceService.getDashboardStats());
     }
 
     @GetMapping("/by-month")
