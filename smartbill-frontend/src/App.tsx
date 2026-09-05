@@ -1,19 +1,21 @@
+import { lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { ProtectedRoute } from '@/components/layout/ProtectedRoute';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Login } from '@/pages/Login';
 import { Register } from '@/pages/Register';
-import { ShopProfile } from '@/pages/ShopProfile';
-import { Inventory } from '@/pages/Inventory';
-import { InvoiceList } from '@/pages/InvoiceList';
-import { NonGstInvoiceList } from '@/pages/NonGstInvoiceList';
-import { MonthlyInvoices } from '@/pages/MonthlyInvoices';
-import { CreateInvoice } from '@/pages/CreateInvoice';
-import { CreateNonGstInvoice } from '@/pages/CreateNonGstInvoice';
+import { Dashboard } from '@/pages/Dashboard';
 import { Toaster } from 'react-hot-toast';
 
-import { Dashboard } from '@/pages/Dashboard';
+// Lazy-load non-critical routes to minimize initial bundle size and speed up login/dashboard
+const ShopProfile = lazy(() => import('@/pages/ShopProfile').then((m) => ({ default: m.ShopProfile })));
+const Inventory = lazy(() => import('@/pages/Inventory').then((m) => ({ default: m.Inventory })));
+const InvoiceList = lazy(() => import('@/pages/InvoiceList').then((m) => ({ default: m.InvoiceList })));
+const NonGstInvoiceList = lazy(() => import('@/pages/NonGstInvoiceList').then((m) => ({ default: m.NonGstInvoiceList })));
+const MonthlyInvoices = lazy(() => import('@/pages/MonthlyInvoices').then((m) => ({ default: m.MonthlyInvoices })));
+const CreateInvoice = lazy(() => import('@/pages/CreateInvoice').then((m) => ({ default: m.CreateInvoice })));
+const CreateNonGstInvoice = lazy(() => import('@/pages/CreateNonGstInvoice').then((m) => ({ default: m.CreateNonGstInvoice })));
 
 function App() {
   return (

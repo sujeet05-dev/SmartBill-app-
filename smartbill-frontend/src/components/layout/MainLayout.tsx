@@ -138,7 +138,19 @@ export const MainLayout: React.FC = () => {
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto bg-slate-50 p-4 sm:p-6 lg:p-8">
           <div className="mx-auto max-w-7xl">
-            <Outlet />
+            <React.Suspense
+              fallback={
+                <div className="animate-pulse space-y-6">
+                  <div className="h-8 w-48 bg-slate-200 rounded"></div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="h-28 bg-slate-200 rounded-xl"></div>
+                    <div className="h-28 bg-slate-200 rounded-xl"></div>
+                  </div>
+                </div>
+              }
+            >
+              <Outlet />
+            </React.Suspense>
           </div>
         </main>
       </div>

@@ -9,6 +9,7 @@ import com.smartbill.repository.UserRepository;
 import com.smartbill.security.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +38,7 @@ public class AuthService {
 
         String cleanEmail = request.getEmail().trim().toLowerCase();
 
-        if (userRepository.findByEmailIgnoreCase(cleanEmail).isPresent()) {
+        if (userRepository.findByEmail(cleanEmail).isPresent() || userRepository.findByEmailIgnoreCase(cleanEmail).isPresent()) {
             throw new RuntimeException("Email is already registered. Please sign in.");
         }
 
@@ -64,15 +65,21 @@ public class AuthService {
 
         String cleanEmail = email.trim().toLowerCase();
 
-        authenticationManager.authenticate(
+        Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         cleanEmail,
                         request.getPassword()
                 )
         );
 
-        User user = userRepository.findByEmailIgnoreCase(cleanEmail)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + cleanEmail));
+        User user;
+        if (authentication.getPrincipal() instanceof User authenticatedUser) {
+            user = authenticatedUser;
+        } else {
+            user = userRepository.findByEmail(cleanEmail)
+                    .or(() -> userRepository.findByEmailIgnoreCase(cleanEmail))
+                    .orElseThrow(() -> new RuntimeException("User not found with email: " + cleanEmail));
+        }
 
         String jwtToken = jwtService.generateToken(user);
         

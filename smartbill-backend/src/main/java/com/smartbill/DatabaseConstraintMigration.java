@@ -49,8 +49,22 @@ public class DatabaseConstraintMigration implements CommandLineRunner {
                 // Ignore
             }
             
+            // Create performance indexes to speed up dashboard metrics, invoices, and inventory lookups
+            logger.info("Ensuring database performance indexes exist...");
+            try {
+                jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_invoices_user_id ON invoices(user_id)");
+                jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_invoices_user_date ON invoices(user_id, date DESC)");
+                jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_invoices_user_is_gst ON invoices(user_id, is_gst)");
+                jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_invoice_items_invoice_id ON invoice_items(invoice_id)");
+                jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_users_email_lower ON users(LOWER(email))");
+                jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_products_user_id ON products(user_id)");
+                logger.info("Successfully verified/created database performance indexes.");
+            } catch (Exception e) {
+                logger.warn("Could not create performance indexes: {}", e.getMessage());
+            }
+
         } catch (Exception e) {
-            logger.warn("Could not execute database migration for unique constraint: {}", e.getMessage());
+            logger.warn("Could not execute database migration: {}", e.getMessage());
         }
     }
 }

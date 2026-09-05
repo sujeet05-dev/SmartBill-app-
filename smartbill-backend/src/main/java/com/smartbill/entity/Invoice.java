@@ -10,6 +10,10 @@ import java.util.List;
 @Entity
 @Table(name = "invoices", uniqueConstraints = {
     @UniqueConstraint(columnNames = {"user_id", "invoice_number"})
+}, indexes = {
+    @Index(name = "idx_invoices_user_id", columnList = "user_id"),
+    @Index(name = "idx_invoices_user_date", columnList = "user_id, date"),
+    @Index(name = "idx_invoices_user_is_gst", columnList = "user_id, isGst")
 })
 public class Invoice {
 

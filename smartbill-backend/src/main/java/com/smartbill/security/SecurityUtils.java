@@ -20,6 +20,9 @@ public class SecurityUtils {
         if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
             throw new RuntimeException("User not authenticated");
         }
+        if (authentication.getPrincipal() instanceof User user) {
+            return user;
+        }
         String email = authentication.getName();
         return userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new RuntimeException("Authenticated user not found: " + email));
