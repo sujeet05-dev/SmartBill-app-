@@ -73,6 +73,29 @@ public class DatabaseConstraintMigration implements CommandLineRunner {
             }
             logger.info("Successfully verified database performance indexes.");
 
+            // Ensure column decimal precision supports 4 digits after the decimal point
+            logger.info("Verifying 4-digit decimal precision on financial columns...");
+            String[] decimalStatements = {
+                "ALTER TABLE invoices ALTER COLUMN sub_total TYPE NUMERIC(16, 4)",
+                "ALTER TABLE invoices ALTER COLUMN total_gst TYPE NUMERIC(16, 4)",
+                "ALTER TABLE invoices ALTER COLUMN cgst_amount TYPE NUMERIC(16, 4)",
+                "ALTER TABLE invoices ALTER COLUMN sgst_amount TYPE NUMERIC(16, 4)",
+                "ALTER TABLE invoices ALTER COLUMN grand_total TYPE NUMERIC(16, 4)",
+                "ALTER TABLE invoices ALTER COLUMN received_amount TYPE NUMERIC(16, 4)",
+                "ALTER TABLE invoice_items ALTER COLUMN unit_price TYPE NUMERIC(16, 4)",
+                "ALTER TABLE invoice_items ALTER COLUMN gst_amount TYPE NUMERIC(16, 4)",
+                "ALTER TABLE invoice_items ALTER COLUMN total_amount TYPE NUMERIC(16, 4)"
+            };
+
+            for (String sql : decimalStatements) {
+                try {
+                    jdbcTemplate.execute(sql);
+                } catch (Exception e) {
+                    logger.debug("Column alter note for '{}': {}", sql, e.getMessage());
+                }
+            }
+            logger.info("Successfully verified 4-digit decimal precision on financial columns.");
+
         } catch (Exception e) {
             logger.warn("Could not execute database migration: {}", e.getMessage());
         }

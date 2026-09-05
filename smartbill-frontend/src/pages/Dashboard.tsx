@@ -67,7 +67,7 @@ export const Dashboard: React.FC = () => {
               <div className="h-8 w-36 bg-slate-200 animate-pulse rounded mt-1"></div>
             ) : (
               <p className="text-2xl font-bold text-slate-900">
-                ₹{Number(stats.totalRevenue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ₹{Number(stats.totalRevenue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
               </p>
             )}
           </div>

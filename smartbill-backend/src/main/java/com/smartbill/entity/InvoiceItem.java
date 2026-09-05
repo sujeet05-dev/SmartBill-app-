@@ -29,16 +29,16 @@ public class InvoiceItem {
     @Column(nullable = false)
     private Integer quantity;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = false, precision = 16, scale = 4)
     private BigDecimal unitPrice;
 
     @Column(nullable = false)
     private Double gstPercentage;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = false, precision = 16, scale = 4)
     private BigDecimal gstAmount;
 
-    @Column(nullable = false, precision = 12, scale = 2)
+    @Column(nullable = false, precision = 16, scale = 4)
     private BigDecimal totalAmount;
 
     @ElementCollection(fetch = FetchType.LAZY)

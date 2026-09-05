@@ -265,14 +265,14 @@ export const CreateNonGstInvoice: React.FC = () => {
                           <input
                             type="number"
                             min="0"
-                            step="0.01"
+                            step="0.0001"
                             placeholder="Rate"
                             className="block w-full rounded-md border-0 py-1.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 px-3 text-right"
                             {...register(`items.${index}.unitPrice` as const, { required: true, valueAsNumber: true })}
                           />
                         </td>
                         <td className="py-3 px-3 text-right text-sm font-medium text-slate-900 align-top">
-                          ₹{itemTotal.toFixed(2)}
+                          ₹{itemTotal.toFixed(4)}
                         </td>
                         <td className="py-3 px-3 text-right align-top">
                           {fields.length > 1 && (
@@ -326,7 +326,7 @@ export const CreateNonGstInvoice: React.FC = () => {
             <div className="space-y-3 text-right">
               <div className="text-lg font-bold text-slate-900 flex justify-between w-56 pt-3 mt-3">
                 <span>Total Amount:</span>
-                <span>₹{totals.grandTotal.toFixed(2)}</span>
+                <span>₹{totals.grandTotal.toFixed(4)}</span>
               </div>
             </div>
           </div>

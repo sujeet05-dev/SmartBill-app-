@@ -57,12 +57,12 @@ export const ViewInvoiceModal: React.FC<ViewInvoiceModalProps> = ({
                 <tr key={idx}>
                   <td className="px-4 py-3 text-sm text-slate-900 whitespace-nowrap">{item.productName || item.product?.name || '-'}</td>
                   <td className="px-4 py-3 text-sm text-slate-500 text-right whitespace-nowrap">{item.quantity}</td>
-                  <td className="px-4 py-3 text-sm text-slate-500 text-right whitespace-nowrap">₹{item.unitPrice.toFixed(2)}</td>
+                  <td className="px-4 py-3 text-sm text-slate-500 text-right whitespace-nowrap">₹{item.unitPrice.toFixed(4)}</td>
                   <td className="px-4 py-3 text-sm text-slate-500 text-right whitespace-nowrap">
-                    {item.gstPercentage}% (₹{item.gstAmount.toFixed(2)})
+                    {item.gstPercentage}% (₹{item.gstAmount.toFixed(4)})
                   </td>
                   <td className="px-4 py-3 text-sm font-medium text-slate-900 text-right whitespace-nowrap">
-                    ₹{item.totalAmount.toFixed(2)}
+                    ₹{item.totalAmount.toFixed(4)}
                   </td>
                 </tr>
               ))}
@@ -75,15 +75,15 @@ export const ViewInvoiceModal: React.FC<ViewInvoiceModalProps> = ({
           <div className="w-64 space-y-3">
             <div className="flex justify-between text-slate-500">
               <span>Subtotal:</span>
-              <span>₹{invoice.subTotal.toFixed(2)}</span>
+              <span>₹{invoice.subTotal.toFixed(4)}</span>
             </div>
             <div className="flex justify-between text-slate-500">
               <span>Total GST:</span>
-              <span>₹{invoice.totalGst.toFixed(2)}</span>
+              <span>₹{invoice.totalGst.toFixed(4)}</span>
             </div>
             <div className="flex justify-between font-bold text-slate-900 text-base pt-3 border-t border-slate-200">
               <span>Grand Total:</span>
-              <span>₹{invoice.grandTotal.toFixed(2)}</span>
+              <span>₹{invoice.grandTotal.toFixed(4)}</span>
             </div>
           </div>
         </div>

@@ -136,7 +136,7 @@ public class InvoiceService {
                 itemGstPct = 0.0;
             }
             
-            item.setUnitPrice(itemPrice);
+            item.setUnitPrice(itemPrice.setScale(4, RoundingMode.HALF_UP));
             
             // If it's a non-GST bill, force GST to 0 regardless of product settings
             if (!isGstBill) {
@@ -144,9 +144,9 @@ public class InvoiceService {
             }
             item.setGstPercentage(itemGstPct);
 
-            BigDecimal itemTotalExGst = itemPrice.multiply(new BigDecimal(itemDto.getQuantity()));
-            BigDecimal itemGst = itemTotalExGst.multiply(new BigDecimal(itemGstPct)).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
-            BigDecimal itemTotalAmount = itemTotalExGst.add(itemGst);
+            BigDecimal itemTotalExGst = itemPrice.multiply(new BigDecimal(itemDto.getQuantity())).setScale(4, RoundingMode.HALF_UP);
+            BigDecimal itemGst = itemTotalExGst.multiply(new BigDecimal(itemGstPct)).divide(new BigDecimal(100), 4, RoundingMode.HALF_UP);
+            BigDecimal itemTotalAmount = itemTotalExGst.add(itemGst).setScale(4, RoundingMode.HALF_UP);
 
             item.setGstAmount(itemGst);
             item.setTotalAmount(itemTotalAmount);
@@ -158,14 +158,14 @@ public class InvoiceService {
         }
 
         // CGST and SGST split (each = total GST / 2)
-        BigDecimal cgst = totalGst.divide(new BigDecimal(2), 2, RoundingMode.HALF_UP);
-        BigDecimal sgst = totalGst.subtract(cgst);
+        BigDecimal cgst = totalGst.divide(new BigDecimal(2), 4, RoundingMode.HALF_UP);
+        BigDecimal sgst = totalGst.subtract(cgst).setScale(4, RoundingMode.HALF_UP);
 
-        invoice.setSubTotal(subTotal);
-        invoice.setTotalGst(totalGst);
+        invoice.setSubTotal(subTotal.setScale(4, RoundingMode.HALF_UP));
+        invoice.setTotalGst(totalGst.setScale(4, RoundingMode.HALF_UP));
         invoice.setCgstAmount(cgst);
         invoice.setSgstAmount(sgst);
-        invoice.setGrandTotal(subTotal.add(totalGst));
+        invoice.setGrandTotal(subTotal.add(totalGst).setScale(4, RoundingMode.HALF_UP));
 
         // Amount in words
         invoice.setAmountInWords(NumberToWordsConverter.convert(invoice.getGrandTotal()));

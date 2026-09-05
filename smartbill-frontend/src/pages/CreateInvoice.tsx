@@ -259,15 +259,15 @@ export const CreateInvoice: React.FC = () => {
                         />
                       </td>
                       <td className="py-3 px-3 text-right text-sm text-slate-900">
-                        ₹{rate.toFixed(2)}
+                        ₹{rate.toFixed(4)}
                       </td>
                       <td className="py-3 px-3 text-right text-sm text-slate-900">
-                        ₹{itemGst.toFixed(2)}
+                        ₹{itemGst.toFixed(4)}
                         <br />
                         <span className="text-xs text-slate-500">({gstPct}%)</span>
                       </td>
                       <td className="py-3 px-3 text-right text-sm font-medium text-slate-900">
-                        ₹{itemTotal.toFixed(2)}
+                        ₹{itemTotal.toFixed(4)}
                       </td>
                       <td className="py-3 px-3 text-right">
                         <button
@@ -297,19 +297,19 @@ export const CreateInvoice: React.FC = () => {
             <div className="space-y-3 text-right">
               <div className="text-sm text-slate-500 flex justify-between w-56">
                 <span>Taxable Amount:</span>
-                <span className="text-slate-900">₹{totals.subTotal.toFixed(2)}</span>
+                <span className="text-slate-900">₹{totals.subTotal.toFixed(4)}</span>
               </div>
               <div className="text-sm text-slate-500 flex justify-between w-56">
                 <span>CGST:</span>
-                <span className="text-slate-900">₹{(totals.totalGst / 2).toFixed(2)}</span>
+                <span className="text-slate-900">₹{(totals.totalGst / 2).toFixed(4)}</span>
               </div>
               <div className="text-sm text-slate-500 flex justify-between w-56">
                 <span>SGST:</span>
-                <span className="text-slate-900">₹{(totals.totalGst / 2).toFixed(2)}</span>
+                <span className="text-slate-900">₹{(totals.totalGst / 2).toFixed(4)}</span>
               </div>
               <div className="text-lg font-bold text-slate-900 flex justify-between w-56 border-t pt-3 mt-3">
                 <span>Total Amount:</span>
-                <span>₹{totals.grandTotal.toFixed(2)}</span>
+                <span>₹{totals.grandTotal.toFixed(4)}</span>
               </div>
             </div>
           </div>

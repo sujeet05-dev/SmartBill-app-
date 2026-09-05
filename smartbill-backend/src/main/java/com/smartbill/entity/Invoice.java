@@ -47,22 +47,22 @@ public class Invoice {
     @Column(nullable = false)
     private PaymentMethod paymentMethod;
 
-    @Column(nullable = false, precision = 12, scale = 2)
+    @Column(nullable = false, precision = 16, scale = 4)
     private BigDecimal subTotal;
 
-    @Column(nullable = false, precision = 12, scale = 2)
+    @Column(nullable = false, precision = 16, scale = 4)
     private BigDecimal totalGst;
 
-    @Column(precision = 12, scale = 2)
+    @Column(precision = 16, scale = 4)
     private BigDecimal cgstAmount;
 
-    @Column(precision = 12, scale = 2)
+    @Column(precision = 16, scale = 4)
     private BigDecimal sgstAmount;
 
-    @Column(nullable = false, precision = 12, scale = 2)
+    @Column(nullable = false, precision = 16, scale = 4)
     private BigDecimal grandTotal;
 
-    @Column(precision = 12, scale = 2)
+    @Column(precision = 16, scale = 4)
     private BigDecimal receivedAmount;
 
     @Column(columnDefinition = "TEXT")
