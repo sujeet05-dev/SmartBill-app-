@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/common/Input';
@@ -41,7 +41,7 @@ export const CreateNonGstInvoice: React.FC = () => {
     }
   };
 
-  const calculateTotals = () => {
+  const totals = useMemo(() => {
     let subTotal = 0;
 
     watchItems.forEach((item) => {
@@ -55,9 +55,7 @@ export const CreateNonGstInvoice: React.FC = () => {
       totalGst: 0,
       grandTotal: subTotal
     };
-  };
-
-  const totals = calculateTotals();
+  }, [watchItems]);
 
   const onSubmit = async (data: InvoiceCreate) => {
     try {
@@ -113,6 +111,9 @@ export const CreateNonGstInvoice: React.FC = () => {
         isGst: false,
         items: items
       });
+
+      productService.clearCache();
+      sessionStorage.removeItem('smartbill_dashboard_stats');
 
       toast.success('Non-GST Bill generated successfully!');
       navigate('/non-gst-invoices');

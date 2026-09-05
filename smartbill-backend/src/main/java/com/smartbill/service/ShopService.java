@@ -8,7 +8,9 @@ import com.smartbill.repository.ShopRepository;
 import com.smartbill.security.SecurityUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class ShopService {
@@ -16,6 +18,7 @@ public class ShopService {
     private final ShopRepository shopRepository;
     private final ShopMapper shopMapper;
     private final SecurityUtils securityUtils;
+    private final Map<Long, ShopDto> shopCache = new ConcurrentHashMap<>();
 
     public ShopService(ShopRepository shopRepository, ShopMapper shopMapper, SecurityUtils securityUtils) {
         this.shopRepository = shopRepository;
@@ -25,8 +28,16 @@ public class ShopService {
 
     public ShopDto getShop() {
         User currentUser = securityUtils.getCurrentUser();
+        Long userId = currentUser.getId();
+        if (shopCache.containsKey(userId)) {
+            return shopCache.get(userId);
+        }
         Optional<Shop> shopOpt = shopRepository.findByUser(currentUser);
-        return shopOpt.map(shopMapper::toDto).orElse(null);
+        ShopDto dto = shopOpt.map(shopMapper::toDto).orElse(null);
+        if (dto != null) {
+            shopCache.put(userId, dto);
+        }
+        return dto;
     }
 
     public ShopDto saveOrUpdateShop(ShopDto shopDto) {
@@ -52,6 +63,10 @@ public class ShopService {
         }
         
         Shop saved = shopRepository.save(shop);
-        return shopMapper.toDto(saved);
+        ShopDto savedDto = shopMapper.toDto(saved);
+        if (savedDto != null) {
+            shopCache.put(currentUser.getId(), savedDto);
+        }
+        return savedDto;
     }
 }

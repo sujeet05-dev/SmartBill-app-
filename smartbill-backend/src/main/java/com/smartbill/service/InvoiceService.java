@@ -172,46 +172,34 @@ public class InvoiceService {
 
         invoice.setItems(items);
 
-        // Assign a temporary unique invoice number to satisfy NOT NULL constraints before final sequence is determined
-        String tempId = "TEMP-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 5);
-        invoice.setInvoiceNumber(tempId);
-
-        Invoice saved = invoiceRepository.save(invoice);
-        
+        // Determine sequential invoice number before saving in a single INSERT
         long invoiceNum;
         if (isGstBill) {
-            List<String> numbers = invoiceRepository.findAllGstInvoiceNumbersByUser(currentUser);
+            Optional<String> maxOpt = invoiceRepository.findMaxGstInvoiceNumberByUser(currentUser.getId());
             long max = 499;
-            for (String n : numbers) {
-                if (n == null || n.startsWith("TEMP-")) continue;
+            if (maxOpt.isPresent()) {
                 try {
-                    long val = Long.parseLong(n);
+                    long val = Long.parseLong(maxOpt.get());
                     if (val > max) max = val;
-                } catch (NumberFormatException e) {
-                    // skip invalid formats
-                }
+                } catch (NumberFormatException ignored) {}
             }
             invoiceNum = max + 1;
-            saved.setInvoiceNumber(String.format("%06d", invoiceNum));
+            invoice.setInvoiceNumber(String.format("%06d", invoiceNum));
         } else {
-            List<String> numbers = invoiceRepository.findAllNonGstInvoiceNumbersByUser(currentUser);
+            Optional<String> maxOpt = invoiceRepository.findMaxNonGstInvoiceNumberByUser(currentUser.getId());
             long max = 0;
-            for (String n : numbers) {
-                if (n == null || n.startsWith("TEMP-")) continue;
+            if (maxOpt.isPresent()) {
                 try {
-                    String numStr = n.replace("EST-", "");
+                    String numStr = maxOpt.get().replace("EST-", "");
                     long val = Long.parseLong(numStr);
                     if (val > max) max = val;
-                } catch (NumberFormatException e) {
-                    // skip invalid formats
-                }
+                } catch (NumberFormatException ignored) {}
             }
             invoiceNum = max + 1;
-            saved.setInvoiceNumber("EST-" + String.format("%04d", invoiceNum));
+            invoice.setInvoiceNumber("EST-" + String.format("%04d", invoiceNum));
         }
-        
-        saved = invoiceRepository.save(saved);
 
+        Invoice saved = invoiceRepository.save(invoice);
         return invoiceMapper.toDto(saved);
     }
 
@@ -265,35 +253,33 @@ public class InvoiceService {
     @Transactional(readOnly = true)
     public List<MonthlySummaryDto> getMonthlySummary() {
         User currentUser = securityUtils.getCurrentUser();
-        List<Invoice> invoices = invoiceRepository.findByUserAndIsGstOrderByDateDesc(currentUser, true);
+        List<Object[]> rows = invoiceRepository.getMonthlySummaryRaw(currentUser.getId());
+        List<MonthlySummaryDto> result = new ArrayList<>(rows.size());
 
-        Map<String, MonthlySummaryDto> summaryMap = new LinkedHashMap<>();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM yyyy");
+        for (Object[] row : rows) {
+            int year = ((Number) row[0]).intValue();
+            int month = ((Number) row[1]).intValue();
+            long count = ((Number) row[2]).longValue();
+            BigDecimal amount = new BigDecimal(row[3].toString());
+            BigDecimal gst = new BigDecimal(row[4].toString());
 
-        for (Invoice invoice : invoices) {
-            String monthYear = invoice.getDate().format(formatter);
-            int year = invoice.getDate().getYear();
-            int month = invoice.getDate().getMonthValue();
-
-            MonthlySummaryDto summary = summaryMap.computeIfAbsent(monthYear, k ->
-                    new MonthlySummaryDto(k, year, month, 0, BigDecimal.ZERO, BigDecimal.ZERO)
-            );
-
-            summary.setTotalInvoices(summary.getTotalInvoices() + 1);
-            summary.setTotalAmount(summary.getTotalAmount().add(invoice.getGrandTotal()));
-            summary.setTotalGst(summary.getTotalGst().add(invoice.getTotalGst()));
+            String monthName = java.time.Month.of(month).getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.ENGLISH);
+            String monthYear = monthName + " " + year;
+            result.add(new MonthlySummaryDto(monthYear, year, month, count, amount, gst));
         }
 
-        return new ArrayList<>(summaryMap.values());
+        return result;
     }
 
     @Transactional(readOnly = true)
     public List<InvoiceDto> getInvoicesByMonth(int year, int month) {
         User currentUser = securityUtils.getCurrentUser();
-        List<Invoice> allInvoices = invoiceRepository.findByUserAndIsGstOrderByDateDesc(currentUser, true);
+        LocalDate firstDay = LocalDate.of(year, month, 1);
+        LocalDateTime start = firstDay.atStartOfDay();
+        LocalDateTime end = firstDay.plusMonths(1).atStartOfDay();
 
-        return allInvoices.stream()
-                .filter(i -> i.getDate().getYear() == year && i.getDate().getMonthValue() == month)
+        List<Invoice> invoices = invoiceRepository.findByMonthAndUser(currentUser, start, end);
+        return invoices.stream()
                 .map(invoiceMapper::toDto)
                 .collect(Collectors.toList());
     }

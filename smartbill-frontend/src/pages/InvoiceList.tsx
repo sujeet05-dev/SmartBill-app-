@@ -7,31 +7,34 @@ import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import { ViewInvoiceModal } from './ViewInvoiceModal';
 
+import { useDebounce } from '@/hooks/useDebounce';
+
 export const InvoiceList: React.FC = () => {
   const navigate = useNavigate();
   const [invoices, setInvoices] = useState<InvoiceResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 300);
   
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceResponse | null>(null);
 
-  useEffect(() => {
-    loadInvoices();
-  }, [search]);
-
-  const loadInvoices = async () => {
+  const loadInvoices = React.useCallback(async (query: string = debouncedSearch) => {
     try {
       setIsLoading(true);
-      const data = await invoiceService.getAllInvoices(search);
+      const data = await invoiceService.getAllInvoices(query);
       setInvoices(data);
     } catch (error) {
       console.error('Failed to load invoices', error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [debouncedSearch]);
+
+  useEffect(() => {
+    loadInvoices(debouncedSearch);
+  }, [debouncedSearch, loadInvoices]);
 
   const handleDownloadPdf = async (id: number, invoiceNumber: string) => {
     try {

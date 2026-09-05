@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/common/Input';
@@ -41,7 +41,7 @@ export const CreateInvoice: React.FC = () => {
     }
   };
 
-  const calculateTotals = () => {
+  const totals = useMemo(() => {
     let subTotal = 0;
     let totalGst = 0;
 
@@ -60,9 +60,7 @@ export const CreateInvoice: React.FC = () => {
       totalGst,
       grandTotal: subTotal + totalGst
     };
-  };
-
-  const totals = calculateTotals();
+  }, [watchItems, products]);
 
   const onSubmit = async (data: InvoiceCreate) => {
     try {
@@ -112,6 +110,9 @@ export const CreateInvoice: React.FC = () => {
         ...data,
         items: items
       });
+
+      productService.clearCache();
+      sessionStorage.removeItem('smartbill_dashboard_stats');
 
       toast.success('Invoice generated successfully!');
       // Redirect to invoice history after successful creation

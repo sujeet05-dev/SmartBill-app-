@@ -5,21 +5,20 @@ import { Search, Plus, Edit2, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ProductFormModal } from './ProductFormModal';
 
+import { useDebounce } from '@/hooks/useDebounce';
+
 export const Inventory: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 300);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
 
-  useEffect(() => {
-    loadProducts();
-  }, [search]);
-
   const loadProducts = async () => {
     try {
       setIsLoading(true);
-      const data = await productService.getAllProducts(search);
+      const data = await productService.getAllProducts(debouncedSearch);
       setProducts(data);
     } catch (error) {
       console.error('Failed to load products', error);
@@ -28,6 +27,10 @@ export const Inventory: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadProducts();
+  }, [debouncedSearch]);
 
   const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this product?')) {

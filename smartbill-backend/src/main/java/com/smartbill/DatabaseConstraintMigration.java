@@ -55,7 +55,11 @@ public class DatabaseConstraintMigration implements CommandLineRunner {
                 jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_invoices_user_id ON invoices(user_id)");
                 jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_invoices_user_date ON invoices(user_id, date DESC)");
                 jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_invoices_user_is_gst ON invoices(user_id, is_gst)");
+                jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_invoices_user_gst_num ON invoices(user_id, is_gst, invoice_number)");
                 jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_invoice_items_invoice_id ON invoice_items(invoice_id)");
+                jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_invoice_items_product_id ON invoice_items(product_id)");
+                jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_product_imeis_product_id ON product_imeis(product_id)");
+                jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_invoice_item_imeis_item_id ON invoice_item_imeis(invoice_item_id)");
                 jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_users_email_lower ON users(LOWER(email))");
                 jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_products_user_id ON products(user_id)");
                 logger.info("Successfully verified/created database performance indexes.");
