@@ -32,7 +32,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     @Query(value = "SELECT invoice_number FROM invoices WHERE user_id = :userId AND invoice_number LIKE 'EST-%' AND invoice_number NOT LIKE 'TEMP-%' ORDER BY LENGTH(invoice_number) DESC, invoice_number DESC LIMIT 1", nativeQuery = true)
     Optional<String> findMaxNonGstInvoiceNumberByUser(@Param("userId") Long userId);
 
-    @EntityGraph(attributePaths = {"items", "items.product", "items.selectedImeis"})
+    @EntityGraph(attributePaths = {"items", "items.product"})
     Optional<Invoice> findByIdAndUser(Long id, User user);
 
     @EntityGraph(attributePaths = {"items", "items.product"})

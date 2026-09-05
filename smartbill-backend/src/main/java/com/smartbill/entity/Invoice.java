@@ -13,7 +13,8 @@ import java.util.List;
 }, indexes = {
     @Index(name = "idx_invoices_user_id", columnList = "user_id"),
     @Index(name = "idx_invoices_user_date", columnList = "user_id, date"),
-    @Index(name = "idx_invoices_user_is_gst", columnList = "user_id, isGst")
+    @Index(name = "idx_invoices_user_is_gst", columnList = "user_id, is_gst"),
+    @Index(name = "idx_invoices_user_gst_num", columnList = "user_id, is_gst, invoice_number")
 })
 public class Invoice {
 
