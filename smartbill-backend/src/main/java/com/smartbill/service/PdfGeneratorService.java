@@ -272,7 +272,11 @@ public class PdfGeneratorService {
                 subTotalTable.addCell(stGst);
             }
 
-            PdfPCell stTotal = createCell("\u20B9 " + formatAmount(invoice.getGrandTotal()), bigBoldFont);
+            BigDecimal itemSum = invoice.getSubTotal() != null ? invoice.getSubTotal() : BigDecimal.ZERO;
+            if (invoice.getTotalGst() != null) {
+                itemSum = itemSum.add(invoice.getTotalGst());
+            }
+            PdfPCell stTotal = createCell("\u20B9 " + formatAmount(itemSum), bigBoldFont);
             stTotal.setBorder(Rectangle.BOX);
             stTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
             subTotalTable.addCell(stTotal);
@@ -317,6 +321,11 @@ public class PdfGeneratorService {
                 addTaxRow(taxTable, "Taxable Amount", "\u20B9 " + formatAmount(invoice.getSubTotal()), boldFont, normalFont);
                 addTaxRow(taxTable, "CGST @" + (int)halfRate + "%", "\u20B9 " + formatAmount(invoice.getCgstAmount()), normalFont, normalFont);
                 addTaxRow(taxTable, "SGST @" + (int)halfRate + "%", "\u20B9 " + formatAmount(invoice.getSgstAmount()), normalFont, normalFont);
+            }
+            if (invoice.getRoundOff() != null && invoice.getRoundOff().compareTo(BigDecimal.ZERO) != 0) {
+                String roundOffStr = (invoice.getRoundOff().compareTo(BigDecimal.ZERO) < 0 ? "- \u20B9 " : "+ \u20B9 ") 
+                        + formatAmount(invoice.getRoundOff().abs());
+                addTaxRow(taxTable, "Round Off (Rounding)", roundOffStr, normalFont, normalFont);
             }
             addTaxRow(taxTable, "Total Amount", "\u20B9 " + formatAmount(invoice.getGrandTotal()), bigBoldFont, bigBoldFont);
             addTaxRow(taxTable, "Received Amount", "\u20B9 " + formatAmount(invoice.getReceivedAmount() != null ? invoice.getReceivedAmount() : BigDecimal.ZERO), normalFont, normalFont);

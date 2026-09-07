@@ -35,6 +35,7 @@ public class InvoiceMapper {
         dto.setSgstAmount(invoice.getSgstAmount());
         dto.setGrandTotal(invoice.getGrandTotal());
         dto.setReceivedAmount(invoice.getReceivedAmount());
+        dto.setRoundOff(invoice.getRoundOff());
         dto.setAmountInWords(invoice.getAmountInWords());
         dto.setIsGst(invoice.getIsGst());
 

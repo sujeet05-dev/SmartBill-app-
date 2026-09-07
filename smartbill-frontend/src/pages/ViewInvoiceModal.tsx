@@ -77,10 +77,22 @@ export const ViewInvoiceModal: React.FC<ViewInvoiceModalProps> = ({
               <span>Subtotal:</span>
               <span>₹{invoice.subTotal.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-slate-500">
-              <span>Total GST:</span>
-              <span>₹{invoice.totalGst.toFixed(2)}</span>
-            </div>
+            {invoice.isGst && (
+              <div className="flex justify-between text-slate-500">
+                <span>Total GST:</span>
+                <span>₹{invoice.totalGst.toFixed(2)}</span>
+              </div>
+            )}
+            {invoice.roundOff !== undefined && invoice.roundOff !== null && Number(invoice.roundOff) !== 0 && (
+              <div className="flex justify-between text-slate-500">
+                <span>Rounding:</span>
+                <span className={Number(invoice.roundOff) < 0 ? "text-amber-600 font-medium" : "text-slate-900 font-medium"}>
+                  {Number(invoice.roundOff) < 0 
+                    ? `-₹${Math.abs(Number(invoice.roundOff)).toFixed(2)}` 
+                    : `+₹${Number(invoice.roundOff).toFixed(2)}`}
+                </span>
+              </div>
+            )}
             <div className="flex justify-between font-bold text-slate-900 text-base pt-3 border-t border-slate-200">
               <span>Grand Total:</span>
               <span>₹{invoice.grandTotal.toFixed(2)}</span>

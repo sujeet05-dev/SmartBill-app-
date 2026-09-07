@@ -65,6 +65,9 @@ public class Invoice {
     @Column(precision = 16, scale = 4)
     private BigDecimal receivedAmount;
 
+    @Column(precision = 16, scale = 4)
+    private BigDecimal roundOff = BigDecimal.ZERO;
+
     @Column(columnDefinition = "TEXT")
     private String amountInWords;
 
@@ -126,6 +129,9 @@ public class Invoice {
 
     public BigDecimal getReceivedAmount() { return receivedAmount; }
     public void setReceivedAmount(BigDecimal receivedAmount) { this.receivedAmount = receivedAmount; }
+
+    public BigDecimal getRoundOff() { return roundOff; }
+    public void setRoundOff(BigDecimal roundOff) { this.roundOff = roundOff; }
 
     public String getAmountInWords() { return amountInWords; }
     public void setAmountInWords(String amountInWords) { this.amountInWords = amountInWords; }

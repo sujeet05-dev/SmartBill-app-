@@ -26,6 +26,8 @@ public class InvoiceCreateDto {
 
     private BigDecimal receivedAmount;
 
+    private BigDecimal roundOff;
+
     @NotEmpty(message = "At least one product must be added")
     @Valid
     private List<InvoiceItemCreateDto> items;
@@ -49,6 +51,9 @@ public class InvoiceCreateDto {
 
     public BigDecimal getReceivedAmount() { return receivedAmount; }
     public void setReceivedAmount(BigDecimal receivedAmount) { this.receivedAmount = receivedAmount; }
+
+    public BigDecimal getRoundOff() { return roundOff; }
+    public void setRoundOff(BigDecimal roundOff) { this.roundOff = roundOff; }
 
     public List<InvoiceItemCreateDto> getItems() { return items; }
     public void setItems(List<InvoiceItemCreateDto> items) { this.items = items; }

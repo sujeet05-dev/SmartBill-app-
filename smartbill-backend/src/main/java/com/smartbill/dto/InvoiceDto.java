@@ -22,6 +22,7 @@ public class InvoiceDto {
     private BigDecimal sgstAmount;
     private BigDecimal grandTotal;
     private BigDecimal receivedAmount;
+    private BigDecimal roundOff;
     private String amountInWords;
     private Boolean isGst;
     private List<InvoiceItemDto> items;
@@ -74,6 +75,9 @@ public class InvoiceDto {
 
     public BigDecimal getReceivedAmount() { return receivedAmount; }
     public void setReceivedAmount(BigDecimal receivedAmount) { this.receivedAmount = receivedAmount; }
+
+    public BigDecimal getRoundOff() { return roundOff; }
+    public void setRoundOff(BigDecimal roundOff) { this.roundOff = roundOff; }
 
     public String getAmountInWords() { return amountInWords; }
     public void setAmountInWords(String amountInWords) { this.amountInWords = amountInWords; }

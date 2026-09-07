@@ -80,6 +80,8 @@ public class DatabaseConstraintMigration implements CommandLineRunner {
                 "ALTER TABLE invoices ALTER COLUMN total_gst TYPE NUMERIC(16, 4)",
                 "ALTER TABLE invoices ALTER COLUMN cgst_amount TYPE NUMERIC(16, 4)",
                 "ALTER TABLE invoices ALTER COLUMN sgst_amount TYPE NUMERIC(16, 4)",
+                "ALTER TABLE invoices ADD COLUMN IF NOT EXISTS round_off NUMERIC(16, 4) DEFAULT 0",
+                "ALTER TABLE invoices ALTER COLUMN round_off TYPE NUMERIC(16, 4)",
                 "ALTER TABLE invoices ALTER COLUMN grand_total TYPE NUMERIC(16, 4)",
                 "ALTER TABLE invoices ALTER COLUMN received_amount TYPE NUMERIC(16, 4)",
                 "ALTER TABLE invoice_items ALTER COLUMN unit_price TYPE NUMERIC(16, 4)",

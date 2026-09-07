@@ -161,11 +161,16 @@ public class InvoiceService {
         BigDecimal cgst = totalGst.divide(new BigDecimal(2), 4, RoundingMode.HALF_UP);
         BigDecimal sgst = totalGst.subtract(cgst).setScale(4, RoundingMode.HALF_UP);
 
+        BigDecimal roundOff = createDto.getRoundOff() != null 
+                ? createDto.getRoundOff().setScale(4, RoundingMode.HALF_UP) 
+                : BigDecimal.ZERO.setScale(4, RoundingMode.HALF_UP);
+        invoice.setRoundOff(roundOff);
+
         invoice.setSubTotal(subTotal.setScale(4, RoundingMode.HALF_UP));
         invoice.setTotalGst(totalGst.setScale(4, RoundingMode.HALF_UP));
         invoice.setCgstAmount(cgst);
         invoice.setSgstAmount(sgst);
-        invoice.setGrandTotal(subTotal.add(totalGst).setScale(4, RoundingMode.HALF_UP));
+        invoice.setGrandTotal(subTotal.add(totalGst).add(roundOff).setScale(4, RoundingMode.HALF_UP));
 
         // Amount in words
         invoice.setAmountInWords(NumberToWordsConverter.convert(invoice.getGrandTotal()));

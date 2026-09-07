@@ -16,6 +16,7 @@ export interface InvoiceCreate {
   isGst?: boolean;
   paymentMethod: 'CASH' | 'CARD' | 'UPI' | 'BANK_TRANSFER';
   receivedAmount?: number;
+  roundOff?: number;
   items: InvoiceItemCreate[];
 }
 
@@ -47,6 +48,7 @@ export interface InvoiceResponse {
   sgstAmount: number;
   grandTotal: number;
   receivedAmount: number;
+  roundOff?: number;
   amountInWords: string;
   isGst: boolean;
   items: InvoiceItemResponse[];

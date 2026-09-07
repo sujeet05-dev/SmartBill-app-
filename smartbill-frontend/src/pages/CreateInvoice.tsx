@@ -12,6 +12,9 @@ export const CreateInvoice: React.FC = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRounding, setIsRounding] = useState(false);
+  const [customRoundOff, setCustomRoundOff] = useState<number>(0);
+  const [isManualRoundOff, setIsManualRoundOff] = useState(false);
 
   const { register, control, handleSubmit, watch, formState: { errors } } = useForm<InvoiceCreate>({
     defaultValues: {
@@ -62,6 +65,24 @@ export const CreateInvoice: React.FC = () => {
     };
   }, [watchItems, products]);
 
+  const rawGrandTotal = totals.grandTotal;
+
+  useEffect(() => {
+    if (isRounding) {
+      if (!isManualRoundOff) {
+        const decimal = Number((rawGrandTotal - Math.floor(rawGrandTotal)).toFixed(2));
+        setCustomRoundOff(decimal > 0 ? -decimal : 0);
+      }
+    } else {
+      setCustomRoundOff(0);
+      setIsManualRoundOff(false);
+    }
+  }, [isRounding, rawGrandTotal, isManualRoundOff]);
+
+  const finalGrandTotal = isRounding 
+    ? Math.max(0, Number((rawGrandTotal + customRoundOff).toFixed(2)))
+    : rawGrandTotal;
+
   const onSubmit = async (data: InvoiceCreate) => {
     try {
       setIsLoading(true);
@@ -108,6 +129,7 @@ export const CreateInvoice: React.FC = () => {
 
       await invoiceService.createInvoice({
         ...data,
+        roundOff: isRounding ? customRoundOff : 0,
         items: items
       });
 
@@ -295,21 +317,58 @@ export const CreateInvoice: React.FC = () => {
         <div className="bg-white shadow rounded-lg p-6">
           <div className="flex flex-col md:flex-row justify-end space-y-4 md:space-y-0 md:space-x-12">
             <div className="space-y-3 text-right">
-              <div className="text-sm text-slate-500 flex justify-between w-56">
+              <div className="text-sm text-slate-500 flex justify-between w-64">
                 <span>Taxable Amount:</span>
-                <span className="text-slate-900">₹{totals.subTotal.toFixed(2)}</span>
+                <span className="text-slate-900 font-medium">₹{totals.subTotal.toFixed(2)}</span>
               </div>
-              <div className="text-sm text-slate-500 flex justify-between w-56">
+              <div className="text-sm text-slate-500 flex justify-between w-64">
                 <span>CGST:</span>
-                <span className="text-slate-900">₹{(totals.totalGst / 2).toFixed(2)}</span>
+                <span className="text-slate-900 font-medium">₹{(totals.totalGst / 2).toFixed(2)}</span>
               </div>
-              <div className="text-sm text-slate-500 flex justify-between w-56">
+              <div className="text-sm text-slate-500 flex justify-between w-64">
                 <span>SGST:</span>
-                <span className="text-slate-900">₹{(totals.totalGst / 2).toFixed(2)}</span>
+                <span className="text-slate-900 font-medium">₹{(totals.totalGst / 2).toFixed(2)}</span>
               </div>
-              <div className="text-lg font-bold text-slate-900 flex justify-between w-56 border-t pt-3 mt-3">
+
+              {/* Rounding Option */}
+              <div className="flex items-center justify-between w-64 text-sm border-t border-slate-100 pt-2">
+                <label htmlFor="roundingCheckbox" className="flex items-center gap-2 cursor-pointer text-slate-700 select-none">
+                  <input
+                    id="roundingCheckbox"
+                    type="checkbox"
+                    checked={isRounding}
+                    onChange={(e) => {
+                      setIsRounding(e.target.checked);
+                      if (e.target.checked) {
+                        setIsManualRoundOff(false);
+                      }
+                    }}
+                    className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                  />
+                  <span className="font-medium">Rounding:</span>
+                </label>
+                {isRounding ? (
+                  <div className="flex items-center space-x-1">
+                    <span className="text-slate-500 text-xs">₹</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={customRoundOff}
+                      onChange={(e) => {
+                        setIsManualRoundOff(true);
+                        setCustomRoundOff(parseFloat(e.target.value) || 0);
+                      }}
+                      className="w-20 px-1.5 py-0.5 text-right text-sm font-semibold text-amber-600 bg-amber-50 border border-amber-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                ) : (
+                  <span className="text-slate-400">₹0.00</span>
+                )}
+              </div>
+
+              <div className="text-lg font-bold text-slate-900 flex justify-between w-64 border-t pt-3 mt-1">
                 <span>Total Amount:</span>
-                <span>₹{totals.grandTotal.toFixed(2)}</span>
+                <span>₹{finalGrandTotal.toFixed(2)}</span>
               </div>
             </div>
           </div>
