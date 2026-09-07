@@ -151,7 +151,7 @@ export const InvoiceList: React.FC = () => {
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm font-medium text-slate-900">
-                    ₹{invoice.grandTotal.toFixed(4)}
+                    ₹{invoice.grandTotal.toFixed(2)}
                   </td>
                   <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                     <button 

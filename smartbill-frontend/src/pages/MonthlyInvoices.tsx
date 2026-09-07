@@ -196,7 +196,7 @@ export const MonthlyInvoices: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-emerald-100 text-sm font-medium">Monthly Revenue</p>
-                  <h3 className="text-3xl font-bold mt-1">₹{(selectedMonth?.totalAmount || 0).toFixed(4)}</h3>
+                  <h3 className="text-3xl font-bold mt-1">₹{(selectedMonth?.totalAmount || 0).toFixed(2)}</h3>
                 </div>
                 <div className="p-3 bg-white/20 rounded-lg">
                   <DollarSign className="h-6 w-6 text-white" />
@@ -209,7 +209,7 @@ export const MonthlyInvoices: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-indigo-100 text-sm font-medium">Total GST Collected</p>
-                  <h3 className="text-3xl font-bold mt-1">₹{(selectedMonth?.totalGst || 0).toFixed(4)}</h3>
+                  <h3 className="text-3xl font-bold mt-1">₹{(selectedMonth?.totalGst || 0).toFixed(2)}</h3>
                 </div>
                 <div className="p-3 bg-white/20 rounded-lg">
                   <Receipt className="h-6 w-6 text-white" />
@@ -321,7 +321,7 @@ export const MonthlyInvoices: React.FC = () => {
                           </span>
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm font-bold text-slate-900">
-                          ₹{invoice.grandTotal.toFixed(4)}
+                          ₹{invoice.grandTotal.toFixed(2)}
                         </td>
                         <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                           <button

@@ -272,7 +272,7 @@ export const CreateNonGstInvoice: React.FC = () => {
                           />
                         </td>
                         <td className="py-3 px-3 text-right text-sm font-medium text-slate-900 align-top">
-                          ₹{itemTotal.toFixed(4)}
+                          ₹{itemTotal.toFixed(2)}
                         </td>
                         <td className="py-3 px-3 text-right align-top">
                           {fields.length > 1 && (
@@ -326,7 +326,7 @@ export const CreateNonGstInvoice: React.FC = () => {
             <div className="space-y-3 text-right">
               <div className="text-lg font-bold text-slate-900 flex justify-between w-56 pt-3 mt-3">
                 <span>Total Amount:</span>
-                <span>₹{totals.grandTotal.toFixed(4)}</span>
+                <span>₹{totals.grandTotal.toFixed(2)}</span>
               </div>
             </div>
           </div>
