@@ -392,8 +392,8 @@ public class PdfGeneratorService {
     }
 
     private String formatAmount(BigDecimal amount) {
-        if (amount == null) return "0.0000";
-        return String.format(java.util.Locale.US, "%,.4f", amount);
+        if (amount == null) return "0.00";
+        return String.format(java.util.Locale.US, "%.2f", amount);
     }
 
     public byte[] generateMonthlyReportPdf(int year, int month, List<InvoiceDto> invoices) {
